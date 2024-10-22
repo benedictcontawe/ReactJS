@@ -1,7 +1,7 @@
 import React from 'react';
 import "./App.css";
-import TaskForm from './compose/TaskForm';
-import TaskColumn from './compose/TaskColumn';
+import TaskForm from './components/TaskForm';
+import TaskColumn from './components/TaskColumn';
 import Todo from "./assets/direct-hit.png";
 import Doing from "./assets/glowing-star.png"
 import Done from "./assets/check-mark-button.png"
