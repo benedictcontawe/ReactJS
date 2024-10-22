@@ -9,10 +9,10 @@ const TaskForm = () => {
                 <input type="text" className="task_input" placeholder="Enter your task" />
                 <div className="task_form_bottom_line">
                     <div>
-                        <Tag name="HTML"></Tag> 
-                        <Tag name="CSS"></Tag> 
-                        <Tag name="Javascript"></Tag> 
-                        <Tag name="React"></Tag> 
+                        <Tag text="HTML"></Tag> 
+                        <Tag text="CSS"></Tag> 
+                        <Tag text="Javascript"></Tag> 
+                        <Tag text="React"></Tag> 
                     </div>
                     <div>
                         <select className="task_status">
