@@ -1,12 +1,22 @@
-import React from "react";
+import React, { useState } from "react";
 import "./TaskForm.css";
 import Tag from "./Tag";
 
 const TaskForm = () => {
+    const [task, setTask] = useState("");
+    const handleTaskChange = e => {
+        setTask(e.target.value)
+    }
+    console.log(task)
     return (
         <header className="app_header">
             <form>
-                <input type="text" className="task_input" placeholder="Enter your task" />
+                <input 
+                    type="text" 
+                    className="task_input" 
+                    placeholder="Enter your task" 
+                    onChange={(e) => handleTaskChange(e)}
+                />
                 <div className="task_form_bottom_line">
                     <div>
                         <Tag text="HTML"></Tag> 
