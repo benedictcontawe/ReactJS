@@ -8,16 +8,18 @@ const TaskForm = () => {
         status: "todo"
     })
     const handleChange = e => {
-        const name = e.target.name;
-        const value = e.target.value;
+        const {name, value} = e.target;
         setTaskData(prev => {
             return {...prev, [name]: value}
         })
         console.log(name, value);
     }
+    const handleSubmit = () => {
+        console.log(taskData);
+    }
     return (
         <header className="app_header">
-            <form>
+            <form onSubmit={handleSubmit}>
                 <input 
                     type="text"
                     name="task"
