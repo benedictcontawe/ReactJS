@@ -15,7 +15,7 @@ const TaskForm = () => {
                     type="text" 
                     className="task_input" 
                     placeholder="Enter your task" 
-                    onChange={(e) => handleTaskChange(e)}
+                    onChange={handleTaskChange}
                 />
                 <div className="task_form_bottom_line">
                     <div>
