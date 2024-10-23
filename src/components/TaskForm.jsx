@@ -14,7 +14,8 @@ const TaskForm = () => {
         })
         console.log(name, value);
     }
-    const handleSubmit = () => {
+    const handleSubmit = (e) => {
+        e.preventDefault();
         console.log(taskData);
     }
     return (
