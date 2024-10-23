@@ -8,29 +8,33 @@ const TaskForm = () => {
         status: "todo",
         tags: [],
     })
+    const checkTag = (tag) => {
+        console.log("checkTag", tag, taskData.tags);
+        return taskData.tags.some(item => item === tag)
+    }
     const selectTag = (tag) => {
-        if(taskData.tags.some(item => item === tag)) {
-            const filterTags = taskData.tags.filter(item => item !== tag)
-            setTaskData(prev => {
-                return {...prev, tags: filterTags }
+        console.log("selectTag", tag);
+        if(taskData.tags.some((item) => item === tag)) {
+            const filterTags = taskData.tags.filter((item) => item !== tag);
+            setTaskData((prev) => {
+                return { ...prev, tags: filterTags };
             })
         } else {
-            setTaskData(prev => {
-                return {...prev, tags: [...prev.tags, tag]}
+            setTaskData((prev) => {
+                return { ...prev, tags: [...prev.tags, tag] }
             })
         }
-        console.log("selectTag",tag);
     }
     const handleChange = e => {
+        console.log("handleChange", name, value);
         const {name, value} = e.target;
         setTaskData(prev => {
             return {...prev, [name]: value}
         })
-        console.log("handleChange", name, value);
     }
     const handleSubmit = (e) => {
+        console.log("handleSubmit", taskData);
         e.preventDefault();
-        console.log("handleSubmit",taskData);
     }
     return (
         <header className="app_header">
@@ -44,10 +48,10 @@ const TaskForm = () => {
                 />
                 <div className="task_form_bottom_line">
                     <div>
-                        <Tag text="HTML" tag={selectTag} ></Tag> 
-                        <Tag text="CSS" tag={selectTag} ></Tag> 
-                        <Tag text="Javascript" tag={selectTag} ></Tag> 
-                        <Tag text="React" tag={selectTag} ></Tag> 
+                        <Tag text="HTML" tag={selectTag} selected={checkTag("HTML")} />
+                        <Tag text="CSS" tag={selectTag} selected={checkTag("CSS")} />
+                        <Tag text="JavaScript" tag={selectTag} selected={checkTag("JavaScript")} />
+                        <Tag text="React" tag={selectTag} selected={checkTag("React")} />
                     </div>
                     <div>
                         <select name="status" className="task_status" onChange={handleChange}>
