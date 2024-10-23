@@ -4,8 +4,12 @@ import Tag from "./Tag";
 
 const TaskForm = () => {
     const [task, setTask] = useState("");
+    const [status, setStatus] = useState("todo")
     const handleTaskChange = e => {
         setTask(e.target.value)
+    }
+    const handleStatusChange = e => {
+        setStatus(e.target.value)
     }
     console.log(task)
     return (
@@ -25,7 +29,7 @@ const TaskForm = () => {
                         <Tag text="React"></Tag> 
                     </div>
                     <div>
-                        <select className="task_status">
+                        <select className="task_status" onChange={handleStatusChange}>
                             <option value="todo">To Do</option>
                             <option value="doing">Doing</option>
                             <option value="done">Done</option>
