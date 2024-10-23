@@ -1,10 +1,11 @@
 import React from "react";
 import "./Tag.css"
 
-const Tag = (props) => {
-    console.log("Tag props", props)
+const Tag = ({text, tag}) => {
     return (
-        <button className="tag">{props.text}</button>
+        <button className="tag" onClick={() => tag(text)} >
+                {text}
+        </button>
     )
 }
 

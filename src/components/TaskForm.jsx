@@ -5,18 +5,32 @@ import Tag from "./Tag";
 const TaskForm = () => {
     const [taskData, setTaskData] = useState({
         task: "",
-        status: "todo"
+        status: "todo",
+        tags: [],
     })
+    const selectTag = (tag) => {
+        if(taskData.tags.some(item => item === tag)) {
+            const filterTags = taskData.tags.filter(item => item !== tag)
+            setTaskData(prev => {
+                return {...prev, tags: filterTags }
+            })
+        } else {
+            setTaskData(prev => {
+                return {...prev, tags: [...prev.tags, tag]}
+            })
+        }
+        console.log("selectTag",tag);
+    }
     const handleChange = e => {
         const {name, value} = e.target;
         setTaskData(prev => {
             return {...prev, [name]: value}
         })
-        console.log(name, value);
+        console.log("handleChange", name, value);
     }
     const handleSubmit = (e) => {
         e.preventDefault();
-        console.log(taskData);
+        console.log("handleSubmit",taskData);
     }
     return (
         <header className="app_header">
@@ -30,10 +44,10 @@ const TaskForm = () => {
                 />
                 <div className="task_form_bottom_line">
                     <div>
-                        <Tag text="HTML"></Tag> 
-                        <Tag text="CSS"></Tag> 
-                        <Tag text="Javascript"></Tag> 
-                        <Tag text="React"></Tag> 
+                        <Tag text="HTML" tag={selectTag} ></Tag> 
+                        <Tag text="CSS" tag={selectTag} ></Tag> 
+                        <Tag text="Javascript" tag={selectTag} ></Tag> 
+                        <Tag text="React" tag={selectTag} ></Tag> 
                     </div>
                     <div>
                         <select name="status" className="task_status" onChange={handleChange}>
