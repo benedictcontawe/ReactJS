@@ -4,7 +4,7 @@ import TaskCard from "../components/TaskCard";
 
 const TaskColumn = (props) => {
     console.log("TaskColumn props", props)
-    const {text, icon, tasks, status} = props
+    const {text, icon, tasks, status, handleDelete} = props
     return (
         <section className='task_column'>
             <h2 className="task_column_heading">
@@ -12,7 +12,7 @@ const TaskColumn = (props) => {
             </h2>
             {
                 tasks.map( (task, index) => task.status === status && (
-                    <TaskCard key ={index} text={task.task} tags={task.tags} />
+                    <TaskCard key ={index} text={task.task} tags={task.tags} handleDelete={handleDelete} index={index} />
                 ) )
             }
         </section>

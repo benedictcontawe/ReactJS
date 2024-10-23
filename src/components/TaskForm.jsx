@@ -50,6 +50,7 @@ const TaskForm = ({setTasks}) => {
                 <input 
                     type="text"
                     name="task"
+                    value={taskData.task}
                     className="task_input" 
                     placeholder="Enter your task" 
                     onChange={handleChange}
@@ -62,7 +63,7 @@ const TaskForm = ({setTasks}) => {
                         <Tag text="React" tag={selectTag} selected={checkTag("React")} />
                     </div>
                     <div>
-                        <select name="status" className="task_status" onChange={handleChange}>
+                        <select name="status" value={taskData.status} className="task_status" onChange={handleChange}>
                             <option value="todo">To Do</option>
                             <option value="doing">Doing</option>
                             <option value="done">Done</option>
