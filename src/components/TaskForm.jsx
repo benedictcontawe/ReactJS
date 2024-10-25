@@ -25,16 +25,16 @@ const TaskForm = ({setTasks}) => {
             })
         }
     }
-    const handleChange = e => {
-        const {name, value} = e.target;
+    const handleChange = event => {
+        const {name, value} = event.target;
         console.log("handleChange", name, value);
         setTaskData(prev => {
             return {...prev, [name]: value}
         })
     }
-    const handleSubmit = (e) => {
+    const handleSubmit = (event) => {
         console.log("handleSubmit", taskData);
-        e.preventDefault();
+        event.preventDefault();
         setTasks((prev) => {
             return [...prev, taskData];
         });
