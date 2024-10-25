@@ -1,9 +1,10 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import './MovieList.css';
 import Fire from '../../assets/fire.png'
 import MovieCard from './MovieCard';
 
 const MovieList = () => {
+    const [movies, setMovies] = useState([])
 
     useEffect(() => {
         fetchMovies();
@@ -21,6 +22,7 @@ const MovieList = () => {
         console.log("MovieList", "fetchMovies", "response", response)
         const data = await response.json()
         console.log("MovieList", "fetchMovies", "data", data)
+        setMovies(data.results)
     }
 
   return (
@@ -48,7 +50,9 @@ const MovieList = () => {
             </div>
         </header>
         <div className='movie_cards'>
-            <MovieCard />
+            {
+                movies.map (movie => <MovieCard key={movie.id} movie={movie} />)
+            }
         </div>
     </section>
   )
