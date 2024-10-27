@@ -6,7 +6,7 @@
 
 .movie_list_heading {
     font-size:  20px;
-    color: #FFE400;
+    color: var(--heading_color);
 }
 
 .movie_filter {
