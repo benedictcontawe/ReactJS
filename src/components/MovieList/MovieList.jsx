@@ -27,6 +27,19 @@ const MovieList = () => {
         console.log("MovieList", "Sort", sort);
         if(sort.by !== "default") {
             const sortedMovies = lodash.orderBy(filterMovies, [sort.by], [sort.order])
+            /*
+            const sortedMovies = filterMovies.sort((a, b) => {
+                if (sort.by === "release_date") {
+                    return sort.order === "asc" 
+                        ? new Date(a[sort.by] - new Date(b[sort.by]))
+                        : new Date(b[sort.by] - new Date(a[sort.by]));
+                } else {
+                    return sort.order === "asc" 
+                    ? a[sort.by] - b[sort.by]
+                    : b[sort.by] - a[sort.by];
+                }
+            })
+            */
             setFilterMovies(sortedMovies)
         }
     }, [sort])
