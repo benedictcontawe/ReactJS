@@ -12,3 +12,8 @@ nav {
 .navbar_list a {
     margin: 5px 10px;
 }
+
+.navbar_list a.active {
+    font-weight: 500;
+    color: blue;
+}
