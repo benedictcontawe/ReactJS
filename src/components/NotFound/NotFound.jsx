@@ -1,6 +1,6 @@
 import React from "react";
 
-const NotFound = () => {
+const   NotFound = () => {
     return <h2 style={{ color: "red" }}>404 Page not found!!</h2>;
 };
 
