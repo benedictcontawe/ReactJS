@@ -6,6 +6,8 @@ import Products from "./components/Products/Products"
 import SingleProduct from "./components/Products/SingleProduct"
 import Articles from "./components/Articles/Articles"
 import Admin from "./components/Admin/Admin"
+import Sales from './components/Admin/Sales';
+import Sellers from './components/Admin/Sellers';
 import NotFound from './components/NotFound/NotFound';
 
 const App = () => {
@@ -18,7 +20,10 @@ const App = () => {
                     <Route path="/products" element={<Products />} />
                     <Route path="/products/:id" element={<SingleProduct />} />
                     <Route path="/articles" element={<Articles />} />
-                    <Route path="/admin" element={<Admin />} />
+                    <Route path="/admin" element={<Admin />} >
+                        <Route path="sales" element={<Sales/>}/>
+                        <Route path="sellers" element={<Sellers/>}/>
+                    </Route>
                     <Route path="*" element={<NotFound/>} />
                 </Routes>
             </main>
