@@ -1,5 +1,5 @@
 import React from 'react'
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import './Navbar.css';
 import DarkMode from "../DarkMode/DarkMode"
 import Fire from '../../assets/fire.png'
@@ -12,22 +12,22 @@ const Navbar = () => {
         <h1>MovieManiac</h1>
         <div className="navbar_links">
             <DarkMode />
-            <Link to='/popular'>
+            <NavLink to='/popular'>
                 Popular 
                 <img src={Fire} alt='fire emoji' className='navbar_emoji'/>
-            </Link>
+            </NavLink>
         </div>
         <div className="navbar_links">
-            <Link to='/top_rated'>
+            <NavLink to='/top_rated'>
                 Top Rated 
                 <img src={Star} alt='star emoji' className='navbar_emoji'/>
-            </Link>
+            </NavLink>
         </div>
         <div className="navbar_links">
-            <Link to='/upcoming'>
+            <NavLink to='/upcoming'>
                 Upcomming 
                 <img src={Party} alt='party face emoji' className='navbar_emoji'/>
-            </Link>
+            </NavLink>
         </div>
     </nav>
   )
