@@ -2,7 +2,7 @@ import React from "react";
 import { Link, Outlet, Navigate } from "react-router-dom";
 
 const Admin = () => {
-    const user = {role: "user"}
+    const user = {role: "admin"}
     if(user.role !== "admin") {//Navigate to Home when not admin
         return <Navigate to='/'/>
     }
