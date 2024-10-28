@@ -1,4 +1,5 @@
 import React from 'react'
+import { Link } from "react-router-dom";
 import './Navbar.css';
 import DarkMode from "../DarkMode/DarkMode"
 import Fire from '../../assets/fire.png'
@@ -11,22 +12,22 @@ const Navbar = () => {
         <h1>MovieManiac</h1>
         <div className="navbar_links">
             <DarkMode />
-            <a href='#popular'>
+            <Link to='/popular'>
                 Popular 
                 <img src={Fire} alt='fire emoji' className='navbar_emoji'/>
-            </a>
+            </Link>
         </div>
         <div className="navbar_links">
-            <a href='#top_rated'>
+            <Link to='/top_rated'>
                 Top Rated 
                 <img src={Star} alt='star emoji' className='navbar_emoji'/>
-            </a>
+            </Link>
         </div>
         <div className="navbar_links">
-            <a href='#upcoming'>
+            <Link to='/upcoming'>
                 Upcomming 
                 <img src={Party} alt='party face emoji' className='navbar_emoji'/>
-            </a>
+            </Link>
         </div>
     </nav>
   )

@@ -19,9 +19,7 @@ const MovieList = ({ type, title, emoji }) => {
         .then(response => response.json())
         .then((data) => console.log("MovieList", "data", data));
         */
-    }, [
-        
-    ])
+    }, [type])
     useEffect(() => {
         console.log("MovieList", "Sort", sort);
         if(sort.by !== "default") {
