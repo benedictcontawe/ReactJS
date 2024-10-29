@@ -56,6 +56,25 @@ const Sellers = () => {
             setSellers(sellers);
         });
     };
+    const updateSeller = (seller) => {
+        const updatedSeller = {
+            ...seller, name: seller.name + " Updated"
+        }
+        setSellers(
+            sellers.map((mapSeller) =>
+                mapSeller.id === seller.id ? updatedSeller : mapSeller
+            )
+        );
+        axios.patch(`https://jsonplaceholder.typicode.com/users/${seller.id}`, updatedSeller)
+        .then((response) => {
+            console.log("Sellers", "axios.patch", response.data)
+        })
+        .catch((error) => {
+            console.log("Sellers", "axios.patch", "catch error", error);
+            setErrors(error.message);
+            setSellers(sellers);
+        });
+    }
     const deleteSeller = (id) => {
         setSellers(sellers.filter((seller) => seller.id !== id));
         axios.delete(`https://jsonplaceholder.typicode.com/users/${id}`)
@@ -85,7 +104,10 @@ const Sellers = () => {
                             {seller.name}
                         </td>
                         <td>
-                            <button onClick={() => deleteSeller(seller.id)}>Delete Seller</button>
+                            <button onClick={() => updateSeller(seller)}>Update</button>
+                        </td>
+                        <td>
+                            <button onClick={() => deleteSeller(seller.id)}>Delete</button>
                         </td>
                     </tr>
                 ) 
