@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import apiClient from "../../utils/api-client";
 import Loader from "../Common/Loader";
 
 const Sellers = () => {
@@ -11,13 +11,13 @@ const Sellers = () => {
         fetchSellers();
         /*
         setIsLoading(true)
-        axios.get("https://jsonplaceholder.typicode.com/users")
+        apiClient.get("/users")
         .then((response) => {
-            console.log("Sellers", "axios.get", response);
+            console.log("Sellers", "apiClient.get", response);
             setSellers(response.data);
             setIsLoading(false);
         }).catch((error) => {
-            console.log("Sellers", "axios.get", "catch error", error);
+            console.log("Sellers", "apiClient.get", "catch error", error);
             setIsLoading(false);
             setErrors(error.message);
         })
@@ -26,12 +26,12 @@ const Sellers = () => {
     const fetchSellers = async () => {
         try {
             setIsLoading(true)
-            const response = await axios.get("https://jsonplaceholder.typicode.com/users")
-            console.log("Sellers", "axios.get", response);
+            const response = await apiClient.get("/users")
+            console.log("Sellers", "apiClient.get", response);
             setSellers(response.data);
             setIsLoading(false);
         } catch (error) {
-            console.log("Sellers", "axios.get", "catch error", error);
+            console.log("Sellers", "apiClient.get", "catch error", error);
             setIsLoading(false);
             setErrors(error.message);
         }
@@ -48,10 +48,10 @@ const Sellers = () => {
             id: sellers.length + 1,
         };
         setSellers([newSeller, ...sellers]);
-        axios.post("https://jsonplaceholder.typicode.com/users", newSeller)
+        apiClient.post("/users", newSeller)
         .then((response) => setSellers([response.data, ...sellers]))
         .catch((error) => {
-            console.log("Sellers", "axios.post", "catch error", error);
+            console.log("Sellers", "apiClient.post", "catch error", error);
             setErrors(error.message);
             setSellers(sellers);
         });
@@ -65,24 +65,24 @@ const Sellers = () => {
                 mapSeller.id === seller.id ? updatedSeller : mapSeller
             )
         );
-        axios.patch(`https://jsonplaceholder.typicode.com/users/${seller.id}`, updatedSeller)
+        apiClient.patch(`/users/${seller.id}`, updatedSeller)
         .then((response) => {
-            console.log("Sellers", "axios.patch", response.data)
+            console.log("Sellers", "apiClient.patch", response.data)
         })
         .catch((error) => {
-            console.log("Sellers", "axios.patch", "catch error", error);
+            console.log("Sellers", "apiClient.patch", "catch error", error);
             setErrors(error.message);
             setSellers(sellers);
         });
     }
     const deleteSeller = (id) => {
         setSellers(sellers.filter((seller) => seller.id !== id));
-        axios.delete(`https://jsonplaceholder.typicode.com/users/${id}`)
+        apiClient.delete(`/users/${id}`)
         .then((response) => {
-            console.log("Sellers", "axios.delete", response.data)
+            console.log("Sellers", "apiClient.delete", response.data)
         })
         .catch((error) => {
-            console.log("Sellers", "axios.delete", "catch error", error);
+            console.log("Sellers", "apiClient.delete", "catch error", error);
             setErrors(error.message);
             setSellers(sellers);
         });
