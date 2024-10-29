@@ -19,14 +19,11 @@ const Sellers = () => {
             console.log("Sellers", "Component Unmount")
         }
     }, [name])
-    if(isLoading) return <div>
-        <h3>Loading. . .</h3> 
-        <Loader/>
-    </div>
+    if(isLoading) return <Loader/>
     return (
         <>
         <h3>Admin Sellers Page</h3>
-        <input type="text" onChange={(e) => setName(e.target.value)}></input>
+        <input type="text" onChange={(event) => setName(event.target.value)}></input>
         { isLoading && <Loader/> }
         {
             sellers.map( seller => 
