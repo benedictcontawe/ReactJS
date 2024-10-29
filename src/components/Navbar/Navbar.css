@@ -1,0 +1,40 @@
+.navbar {
+    justify-content: space-between;
+    padding: 0 40px;
+    background-color: #FFF;
+}
+
+.navbar_heading {
+    margin-right: 20px;
+    font-size: 32px;
+}
+
+.navbar_form {
+    width: 450px;
+    height: 40px;
+    border: 1px solid #CDCDCD;
+    border-radius: 5px;
+    padding: 3px;
+}
+
+.navbar_search {
+    flex: 1;
+    height: 100%;
+    padding: 0 7px;
+    font-size: 20px;
+    font-weight: 500;
+    border: none;
+    outline: none;
+}
+
+.search_button {
+    height: 100%;
+    padding: 0 10px;
+    font-size: 20px;
+    font-weight: 500;
+    border: none;
+    border: 5px;
+    background-color: #6457F9;
+    color: #FFF;
+    cursor: pointer;
+}
