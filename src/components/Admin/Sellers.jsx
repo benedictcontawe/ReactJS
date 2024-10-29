@@ -42,11 +42,26 @@ const Sellers = () => {
             console.log("Sellers", "Component Unmount")
         }
     }, [name])
+    const addSeller = () => {
+        const newSeller = {
+            name: name,
+            id: sellers.length + 1,
+        };
+        setSellers([newSeller, ...sellers]);
+        axios.post("https://jsonplaceholder.typicode.com/users", newSeller)
+        .then((response) => setSellers([response.data, ...sellers]))
+        .catch((error) => {
+            console.log("Sellers", "axios.post", "catch error", error);
+            setErrors(error.message);
+            setSellers(sellers);
+        });
+    };
     if(isLoading) return <Loader/>
     return (
         <>
         <h3>Admin Sellers Page</h3>
         <input type="text" onChange={(event) => setName(event.target.value)}></input>
+        <button onClick={addSeller}>Add Seller</button>
         { isLoading && <Loader/> }
         { errors && <em>{errors}</em> }
         {
