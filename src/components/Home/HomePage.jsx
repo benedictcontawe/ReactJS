@@ -1,5 +1,6 @@
 import React from 'react'
 import HeroSection from './HeroSection'
+import FeaturedProducts from './FeaturedProducts'
 import iphone from '../../assets/iphone-14-pro.webp'
 import mac from '../../assets/mac-system-cut.jfif'
 
@@ -12,7 +13,7 @@ const HomePage = () => {
             link='/'
             image={iphone}
         />
-        {/*Featured Products*/}
+        <FeaturedProducts />
         <HeroSection 
             title="Build the ultimate setup" 
             subtitle="You can add Studio Display and colour-matched Magic accesories to your bag after configure your Mac mini"
