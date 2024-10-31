@@ -33,7 +33,7 @@
     font-size: 20px;
     font-weight: 500;
     border: none;
-    border: 5px;
+    border-radius: 5px;
     background-color: #6457F9;
     color: #FFF;
     cursor: pointer;

@@ -37,8 +37,8 @@ const CartPage = () => {
                     <td>$1004</td>
                 </tr>
             </tbody>
-            <button className="search_button checkout_button">Checkout</button>
         </table>
+        <button className="search_button checkout_button">Checkout</button>
     </section>
   )
 }
