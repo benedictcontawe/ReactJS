@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from "zod";
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -17,6 +18,7 @@ const schema = z.object({
 // confirmPassword - Confirm Password does not match Password
 // deliveryAddress - Address must be at least 15 characters.
 const SignupPage = () => {
+    const [image, setImage] = useState(null)
     const { register, handleSubmit, formState: { errors } } = useForm({resolver: zodResolver(schema)})
     const onSubmit = (formData) => {
         console.log("SignupPage", "onSubmit", formData)
@@ -27,12 +29,12 @@ const SignupPage = () => {
                 <h2>SignUp Form</h2>
                 <div className='image_input_section'>
                     <div className='image_preview'>
-                        <img src={user} id='file-ip-1-preview' />
+                        <img src={image ? URL.createObjectURL(image) : user} id='file-ip-1-preview' />
                     </div>
                     <label htmlFor='file-ip-1' className='image_label'>
                         Upload Image
                     </label>
-                    <input type='file' id='file-ip-1' className='image_input' />
+                    <input type='file' onChange={event => setImage(event.target.files[0])} id='file-ip-1' className='image_input' />
                 </div>
                 <div className='form_inputs signup_form_input'>
                     <div>
