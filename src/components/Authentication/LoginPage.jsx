@@ -1,7 +1,8 @@
-import React from 'react'
+import React, { useRef } from 'react'
 import './LoginPage.css'
 
 const LoginPage = () => {
+    const passordRef = useRef(null)
   return (
     <section className='align_center form_page'>
         <form className='authentication_form'>
@@ -13,9 +14,11 @@ const LoginPage = () => {
                 </div>
                 <div>
                     <label htmlFor='phone'>Phone Number</label>
-                    <input type='number' id='phone' className='form_text_input' placeholder='Enter your phone number' />
-                    <button type='submit' className='search_button form_submit'>Submit</button>
+                    <input type='password' ref={passordRef} id='phone' className='form_text_input' placeholder='Enter your phone number' />
+                    <button type='button' onClick={() => passordRef.current.type= "password"} >Hide Password</button>
+                    <button type='button' onClick={() => passordRef.current.type= "text"} >Show Password</button>
                 </div>
+                <button type='submit' className='search_button form_submit'>Submit</button>
             </div>
         </form>
     </section>
