@@ -1,4 +1,3 @@
-import React, { useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from "zod";
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -12,11 +11,11 @@ const schema = z.object({
 const LoginPage = () => {
     const { register, handleSubmit, formState: { errors } } = useForm({resolver: zodResolver(schema)})
     const onSubmit = (formData) => {
-        console.log(formData)
+        console.log("LoginPage", "onSubmit", formData)
     }
     return (
     <section className='align_center form_page'>
-        <form className='authentication_form' onSubmit={handleSubmit(onSubmit)}>
+        <form className='authentication_form' onSubmit={handleSubmit(onSubmit)} >
             <h2>Login Form</h2>
             <div className='form_inputs'>
                 <div>
