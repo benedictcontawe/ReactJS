@@ -1,18 +1,14 @@
-import React, { useRef } from 'react'
+import React, { useRef, useState } from 'react'
 import './LoginPage.css'
 
 const LoginPage = () => {
-    const nameRef = useRef(null)
-    const phoneRef = useRef(null)
+    const [user, setUser] = useState({
+        name: "",
+        phone: ""
+    })
     const handleSubmit = (event) => {
         event.preventDefault();
-        const user = {
-            name: "",
-            phone: 0
-        };
-        user.name = (nameRef.current.value);
-        user.phone = parseInt(phoneRef.current.value)
-        console.log(user);
+        console.log(user)
     }
   return (
     <section className='align_center form_page'>
@@ -21,13 +17,23 @@ const LoginPage = () => {
             <div className='form_inputs'>
                 <div>
                     <label htmlFor="name">Name</label>
-                    <input type='text' ref={nameRef} id='name' className='form_text_input' placeholder='Enter your name' />
+                    <input 
+                        type='text' 
+                        id='name' 
+                        className='form_text_input' 
+                        placeholder='Enter your name' 
+                        onChange={event => setUser({...user, name: event.target.value})}
+                        value={user.name} />
                 </div>
                 <div>
                     <label htmlFor='phone'>Phone Number</label>
-                    <input type='number' ref={phoneRef}  id='phone' className='form_text_input' placeholder='Enter your phone number' />
-                    <button type='button' onClick={() => phoneRef.current.type= "password"} >Hide Number</button>
-                    <button type='button' onClick={() => phoneRef.current.type= "number"} >Show Number</button>
+                    <input 
+                        type='number' 
+                        id='phone' 
+                        className='form_text_input' 
+                        placeholder='Enter your phone number'
+                        onChange={event => setUser({...user, phone: parseInt(event.target.value)})}
+                        value={user.phone} />
                 </div>
                 <button type='submit' className='search_button form_submit'>Submit</button>
             </div>
