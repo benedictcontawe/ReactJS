@@ -1,23 +1,17 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import "./ProductsSidebar.css"
-import apiClient from '../utils/api-client'
 import LinkWithIcon from '../NavBar/LinkWithIcon'
-import rocket from "../../assets/rocket.png"
+import useData from '../../hooks/useData'
 
 const ProductsSidebar = () => {
-  const [categories, setCategories] = useState([])
-  const [error, setError] = useState("")
-  useEffect(() => {
-    apiClient.get("/category")
-    .then(response => setCategories(response.data))
-    .catch(error => setError(error.message))
-  }, [])
+  const { data: categories, error } = useData("/category")
+  console.log("ProductsSidebar", categories)
   return (
     <aside className='products_sidebar'>
         <h2>Category</h2>
         <div className="category_links">
         { error && <em className='form_error'>{error}</em> }
-          {
+          { categories && 
             categories.map( category => 
               <LinkWithIcon 
                 key={category._id}
@@ -26,7 +20,7 @@ const ProductsSidebar = () => {
                 emoji={`http://localhost:8000/category/${category.image}`}
                 sidebar={true}
               />
-            )
+            ) 
           }
         </div>
     </aside>
