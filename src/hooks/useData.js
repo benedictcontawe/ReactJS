@@ -9,7 +9,13 @@ const useData = (endPoint, customConfig, dependencyList) => {
       setIsLoading(true)
       apiClient.get(endPoint, customConfig)
       .then(response => {
-        setData(response.data)
+        if (endPoint == "/products" && data && data.products && customConfig.params.page !== 1) {
+          setData(prev => ({
+            ...prev, products: [...prev.products, ...response.data.products]  
+          }))
+        } else {
+          setData(response.data)
+        }
         setIsLoading(false)
       })
       .catch(error => {
