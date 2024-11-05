@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react'    
 import apiClient from '../components/utils/api-client'
 
-const useData = (url) => {
+const useData = (endPoint, customConfig, dependencyList) => {
     const [data, setData] = useState(null)
     const [error, setError] = useState("")
     const [isLoading, setIsLoading] = useState(false)
     useEffect(() => {
       setIsLoading(true)
-      apiClient.get(url)
+      apiClient.get(endPoint, customConfig)
       .then(response => {
         setData(response.data)
         setIsLoading(false)
@@ -16,7 +16,7 @@ const useData = (url) => {
         setError(error.message)
         setIsLoading(false)
       })
-    }, [])
+    }, dependencyList ? dependencyList : [])
     return { data, error, isLoading }
 }
 
