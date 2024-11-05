@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import "./ProductsList.css"
 import ProductCard from './ProductCard'
 import useData from '../../hooks/useData'
@@ -20,6 +20,16 @@ const ProductsList = () => {
     const currentParams = Object.fromEntries([...search])
     setSearch({ ...currentParams, page: page });
   }
+  useEffect(() => {
+    const handleScroll = () => {
+      const {scrollTop, clientHeight, scrollHeight} = document.documentElement;
+      console.log("Scroll Top", scrollTop,"Client Height", clientHeight, "Scroll Height", scrollHeight);
+      if(scrollTop + clientHeight >= scrollHeight - 1) {
+        console.log("Reached to Bottom!")
+      }
+    }
+    window.addEventListener("scroll", handleScroll)
+  }, [])
   console.log("ProductList", data?.products, error, isLoading)
   return (
     <section>
