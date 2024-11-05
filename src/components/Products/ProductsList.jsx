@@ -2,10 +2,12 @@ import React from 'react'
 import "./ProductsList.css"
 import ProductCard from './ProductCard'
 import useData from '../../hooks/useData'
+import ProductCardSkeleton from './ProductCardSkeleton';
 
 const ProductsList = () => {
-  const { data, error } = useData("/products")  
-  //console.log("ProductList", data.products)
+  const { data, error, isLoading } = useData("/products")
+  const skeletons = [1, 2, 3, 4, 5, 6, 7, 8]
+  console.log("ProductList", data?.products, error, isLoading)
   return (
     <section>
         <header className="align_center products_list_header">
@@ -20,7 +22,8 @@ const ProductsList = () => {
         </header>
         <div className='products_list'>
           { error && <em className='form_error'>{error}</em> }
-          { data.products &&
+          { isLoading && skeletons.map( skeleton => <ProductCardSkeleton key={skeleton} />) }
+          { data?.products &&
             data.products.map( product => 
               <ProductCard 
                 key={product._id}
