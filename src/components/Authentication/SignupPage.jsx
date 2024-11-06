@@ -26,14 +26,11 @@ const SignupPage = () => {
         try {
             console.log("SignupPage", "onSubmit", formData)
             setError("")
-            const { data } = await signUp(formData, image)
-            localStorage.setItem("token", data.token)
+            await signUp(formData, image)
             window.location = "/"
         } catch (error) {
-            if(error.response && error.response.status === 400) {
-                console.log("SignupPage", error.response)
-                setError(error.response.data.message)
-            }
+            console.log("SignupPage", error.response)
+            setError(error.response.data.message)
         }
     }
     return (

@@ -13,13 +13,12 @@ const schema = z.object({
 const LoginPage = () => {
     const [error, setError] = useState("")
     const { register, handleSubmit, formState: { errors } } = useForm({resolver: zodResolver(schema)})
-    const onSubmit = (formData) => {
+    const onSubmit = async (formData) => {
         console.log("LoginPage", "onSubmit", formData)
         setError("")
         login(formData.email, formData.password)
         .then(response => {
             console.log("LoginPage", 'Login successful:', response.data);
-            localStorage.setItem("token", response.data.token)
             window.location = "/"
         }).catch((error) => {
             console.error("LoginPage", 'Login error:', error.response.data);
