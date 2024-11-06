@@ -5,7 +5,6 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import "./SignupPage.css";
 import user from "../../assets/user.webp";
 import { signUp } from '../Network/userServices';
-import { useNavigate } from 'react-router-dom';
 
 const schema = z.object({
     name: z.string().min(3, { message: "Name should be at least 3 characters." }),
@@ -22,7 +21,6 @@ const schema = z.object({
 const SignupPage = () => {
     const [image, setImage] = useState(null)
     const [error, setError] = useState("")
-    let navigate = useNavigate()
     const { register, handleSubmit, formState: { errors } } = useForm({resolver: zodResolver(schema)})
     const onSubmit = async(formData) => {
         try {
@@ -30,7 +28,7 @@ const SignupPage = () => {
             setError("")
             const { data } = await signUp(formData, image)
             localStorage.setItem("token", data.token)
-            navigate("/")
+            window.location = "/"
         } catch (error) {
             if(error.response && error.response.status === 400) {
                 console.log("SignupPage", error.response)

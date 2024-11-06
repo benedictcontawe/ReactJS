@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css';
 import Navbar from './components/NavBar/Navbar';
 import Routing from './components/Routing/Routing';
-import jwtDecode from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode';
 
 const App = () => {
   const [user, setUser] = useState(null)
@@ -23,7 +23,7 @@ const App = () => {
   }, [])
   return (
     <div className='app'>
-      <Navbar />
+      <Navbar user={user} />
       <main>
         <Routing />
       </main>
