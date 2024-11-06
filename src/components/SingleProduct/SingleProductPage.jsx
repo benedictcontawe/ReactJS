@@ -5,7 +5,7 @@ import QuantityInput from './QuantityInput';
 import { useParams } from 'react-router-dom';
 import useData from '../../hooks/useData';
 
-const SingleProductPage = () => {
+const SingleProductPage = ({ addToCart }) => {
     const [selectedImage, setSelectedImage] = useState(0)
     const [quantity, setQuantity] = useState(1)
     const { id } = useParams()
@@ -41,7 +41,7 @@ const SingleProductPage = () => {
             <div className="align_center quantity_input">
                 <QuantityInput quantity={quantity} setQuantity={setQuantity} stock={product.stock} />
             </div>
-            <button className='search_button add_cart'>Add to Cart</button>
+            <button className='search_button add_cart' onClick={() => addToCart(product, quantity)}>Add to Cart</button>
         </div>
     </React.Fragment> }
     </section>
