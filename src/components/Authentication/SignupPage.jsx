@@ -20,10 +20,18 @@ const schema = z.object({
 // deliveryAddress - Address must be at least 15 characters.
 const SignupPage = () => {
     const [image, setImage] = useState(null)
+    const [error, setError] = useState("")
     const { register, handleSubmit, formState: { errors } } = useForm({resolver: zodResolver(schema)})
     const onSubmit = async(formData) => {
-        console.log("SignupPage", "onSubmit", formData)
-        await signUp(formData, image)
+        try {
+            console.log("SignupPage", "onSubmit", formData)
+            await signUp(formData, image)
+        } catch (error) {
+            if(error.response && error.response.status === 400) {
+                console.log("SignupPage", error.response)
+                setError(error.response.data.message)
+            }
+        }
     }
     return (
         <section className='align_center form_page'>
@@ -96,6 +104,7 @@ const SignupPage = () => {
                         { errors.address && <em className="form_error">{errors.address.message}</em> }
                     </div>
                 </div>
+                {error && <em className='form_error'>{error}</em>}
                 <button className='search_button form_submit' type='submit'>
                     Submit
                 </button>

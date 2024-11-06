@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'    
-import apiClient from '../components/utils/api-client'
+import apiClient from '../components/Network/api-client'
 
 const useData = (endPoint, customConfig, dependencyList) => {
     const [data, setData] = useState(null)
