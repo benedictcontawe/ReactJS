@@ -1,3 +1,4 @@
+import axios from 'axios'
 import apiClient from './api-client'
 
 export function signUp(user, image) {
@@ -9,4 +10,11 @@ export function signUp(user, image) {
     body.append("image", image)
     
     return apiClient.post("/user/signup", body)
+}
+
+export function login(email, password) {
+    return apiClient.post (
+        "/user/login", 
+        { email, password }
+    )
 }
