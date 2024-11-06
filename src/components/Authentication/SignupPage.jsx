@@ -4,6 +4,7 @@ import { z } from "zod";
 import { zodResolver } from '@hookform/resolvers/zod'
 import "./SignupPage.css";
 import user from "../../assets/user.webp";
+import { signUp } from '../Network/userServices';
 
 const schema = z.object({
     name: z.string().min(3, { message: "Name should be at least 3 characters." }),
@@ -20,8 +21,9 @@ const schema = z.object({
 const SignupPage = () => {
     const [image, setImage] = useState(null)
     const { register, handleSubmit, formState: { errors } } = useForm({resolver: zodResolver(schema)})
-    const onSubmit = (formData) => {
+    const onSubmit = async(formData) => {
         console.log("SignupPage", "onSubmit", formData)
+        await signUp(formData, image)
     }
     return (
         <section className='align_center form_page'>
