@@ -1,4 +1,3 @@
-import axios from 'axios'
 import apiClient from './api-client'
 import { jwtDecode } from 'jwt-decode';
 
@@ -35,4 +34,8 @@ export function getUser() {
     } catch (error) {
         return null
     }
+}
+
+export function getJwt() {
+    return localStorage.getItem(tokenName)
 }
