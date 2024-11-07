@@ -9,7 +9,7 @@ import CartContext from '../../contexts/CartContext';
 const CartPage = () => {
     const [subtotal, setSubtotal] = useState(0)
     const userObject = useContext(UserContext)
-    const {cart} = useContext(CartContext)
+    const { cart, removeFromCart } = useContext(CartContext)
     useEffect(() => {
         let total = 0;
         cart.forEach(item => {
@@ -35,7 +35,9 @@ const CartPage = () => {
                         <QuantityInput quantity={quantity} stock={product.stock} />
                     </td>
                     <td>${product.price}</td>
-                    <td><img src={remove} alt="remove icon" className='cart_remove_icon' /></td>
+                    <td>
+                        <img src={remove} alt="remove icon" className='cart_remove_icon' onClick={() => removeFromCart(product._id)} />
+                    </td>
                 </tr>
                 ) }
             </tbody>
