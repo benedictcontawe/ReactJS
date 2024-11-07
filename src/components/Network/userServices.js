@@ -9,7 +9,7 @@ export async function signUp(user, image) {
     body.append("email", user.email)
     body.append("password", user.password)
     body.append("deliveryAddress", user.deliveryAddress)
-    body.append("image", image)
+    body.append("profilePic", image)
     const { data } = await apiClient.post("/user/signup", body)
     localStorage.setItem(tokenName, data.token);
 }
