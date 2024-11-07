@@ -4,10 +4,12 @@ import remove from '../../assets/remove.png'
 import Table from '../Common/Table'
 import QuantityInput from '../SingleProduct/QuantityInput'
 import UserContext from '../../contexts/UserContext'
+import CartContext from '../../contexts/CartContext';
 
-const CartPage = ({cart}) => {
+const CartPage = () => {
     const [subtotal, setSubtotal] = useState(0)
     const userObject = useContext(UserContext)
+    const {cart} = useContext(CartContext)
     useEffect(() => {
         let total = 0;
         cart.forEach(item => {

@@ -4,10 +4,12 @@ import Loader from '../Common/Loader'
 import QuantityInput from './QuantityInput';
 import { useParams } from 'react-router-dom';
 import useData from '../../hooks/useData';
+import CartContext from '../../contexts/CartContext';
 
-const SingleProductPage = ({ addToCart }) => {
+const SingleProductPage = () => {
     const [selectedImage, setSelectedImage] = useState(0)
     const [quantity, setQuantity] = useState(1)
+    const { addToCart } = useContext(CartContext)
     const { id } = useParams()
     const { data: product, error, isLoading } = useData(`/products/${id}`)
     console.log("SingleProductPage", product, error, isLoading)
