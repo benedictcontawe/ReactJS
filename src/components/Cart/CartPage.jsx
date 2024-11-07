@@ -5,11 +5,13 @@ import Table from '../Common/Table'
 import QuantityInput from '../SingleProduct/QuantityInput'
 import UserContext from '../../contexts/UserContext'
 import CartContext from '../../contexts/CartContext';
+import { checkoutAPI } from '../../Network/oderServices'
+import { toast } from 'react-toastify'
 
 const CartPage = () => {
     const [subtotal, setSubtotal] = useState(0)
     const userObject = useContext(UserContext)
-    const { cart, removeFromCart, updateCart } = useContext(CartContext)
+    const { cart, removeFromCart, updateCart, setCart } = useContext(CartContext)
     useEffect(() => {
         let total = 0;
         cart.forEach(item => {
@@ -18,6 +20,17 @@ const CartPage = () => {
         setSubtotal(total)
     }, [cart])
     console.log("CartPage", cart, userObject)
+    const checkout = () => {
+        const oldCart = [...cart]
+        setCart([])
+        checkoutAPI().then(() => {
+            console.log("CartPage", "checkoutAPI", "success ")
+            toast.success("Oder placed sucessfully! ")
+        }).catch(() => {
+            toast.error("Something went wrong!")
+            setCart(oldCart)
+        })
+    }
   return (
     <section className="align_center cart_page">
         <div className="align_center user_info">
@@ -58,7 +71,7 @@ const CartPage = () => {
                 </tr>
             </tbody>
         </table>
-        <button className="search_button checkout_button">Checkout</button>
+        <button className="search_button checkout_button" onClick={checkout}>Checkout</button>
     </section>
   )
 }
