@@ -10,14 +10,14 @@ const HomePage = () => {
         <HeroSection 
             title="Buy iPhone 14 Pro" 
             subtitle="Experience the power of the latest 14 with our most pro camera ever."
-            link='/'
+            link='/product/672b000741d5272ab7c53a17'
             image={iphone}
         />
         <FeaturedProducts />
         <HeroSection 
             title="Build the ultimate setup" 
             subtitle="You can add Studio Display and colour-matched Magic accesories to your bag after configure your Mac mini"
-            link='/'
+            link='/product/672b000741d5272ab7c53a1f'
             image={mac}
         />
     </div>
