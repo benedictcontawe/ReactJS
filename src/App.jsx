@@ -48,7 +48,7 @@ const App = () => {
       setCart(cart)
     })
   }
-  const removeFromCart = (type, id) => {
+  const removeFromCart = (id) => {
     const oldCart = [...cart]
     const newCart = oldCart.filter(item => item.product._id !== id)
     setCart(newCart);

@@ -8,7 +8,7 @@ import order from '../../assets/package.png';
 import lock from '../../assets/locked.png';
 import LinkWithIcon from './LinkWithIcon';
 import { NavLink } from 'react-router-dom';
-import UserContext from '../../contexts/UserContext'
+import UserContext from '../../contexts/UserContext';
 import CartContext from '../../contexts/CartContext';
 
 const Navbar = () => {
