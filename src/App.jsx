@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
+import UserContext from './contexts/UserContext';
 import './App.css';
 import Navbar from './components/NavBar/Navbar';
 import Routing from './components/Routing/Routing';
@@ -58,13 +59,15 @@ const App = () => {
     if(user) getCart()
   }, [user])
   return (
-    <div className='app'>
-      <Navbar user={user} cartCount={cart.length}  />
-      <main>
-        <ToastContainer position='top-right'/>
-        <Routing addToCart={addToCart} cart={cart} />
-      </main>
-    </div>
+    <UserContext.Provider value={user}>
+      <div className='app'>
+        <Navbar cartCount={cart.length}  />
+        <main>
+          <ToastContainer position='top-right'/>
+          <Routing addToCart={addToCart} cart={cart} />
+        </main>
+      </div>
+    </UserContext.Provider>
   )
 }
 

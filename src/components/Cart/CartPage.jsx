@@ -1,12 +1,13 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useContext } from 'react'
 import './CartPage.css'
 import remove from '../../assets/remove.png'
-import user from '../../assets/user.webp'
 import Table from '../Common/Table'
 import QuantityInput from '../SingleProduct/QuantityInput'
+import UserContext from '../../contexts/UserContext'
 
 const CartPage = ({cart}) => {
     const [subtotal, setSubtotal] = useState(0)
+    const userObject = useContext(UserContext)
     useEffect(() => {
         let total = 0;
         cart.forEach(item => {
@@ -14,13 +15,13 @@ const CartPage = ({cart}) => {
         });
         setSubtotal(total)
     }, [cart])
-    console.log("CartPage", cart)
+    console.log("CartPage", cart, userObject)
   return (
     <section className="align_center cart_page">
         <div className="align_center user_info">
-            <img src={user} alt="user profile" />
-            <p className="user_name">Harley</p>
-            <p className="user_email">harley@gmail.com</p>
+            <img src={`http://localhost:8000/profile/${userObject?.profilePic}`} alt="user profile" />
+            <p className="user_name">Name: {userObject?.name}</p>
+            <p className="user_email">Email: {userObject?.email}</p>
         </div>
         <Table headings={["Item", "Price", "Quantity", "Total", "Remove"]} >
             <tbody>
