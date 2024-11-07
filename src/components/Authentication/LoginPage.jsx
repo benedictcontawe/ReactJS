@@ -18,11 +18,23 @@ const LoginPage = () => {
     const onSubmit = async (formData) => {
         console.log("LoginPage", "onSubmit", formData)
         setError("")
+        /*
+        try {
+            console.log("LoginPage", 'Login successful:');
+            await login(formData.email, formData.password)
+            const { state } = location;
+            window.location = state ? state.from : "/";
+        } catch (error) {
+            console.error("LoginPage", 'Login error:', error.response.data);
+            if(error.response && error.response.status === 400)
+                setError(error.response.data.message)
+        }
+        */
         login(formData.email, formData.password)
         .then(response => {
             const { state } = location
             console.log("LoginPage", 'Login successful:', response.data, state);
-            window.location = state ? state.form : "/";
+            window.location = state ? state.from : "/";
         }).catch((error) => {
             console.error("LoginPage", 'Login error:', error.response.data);
             if(error.response && error.response.status === 400)
