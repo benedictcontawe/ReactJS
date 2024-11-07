@@ -4,7 +4,7 @@ import './App.css';
 import Navbar from './components/NavBar/Navbar';
 import Routing from './components/Routing/Routing';
 import { getUser, getJwt } from './components/Network/userServices';
-import { addToCartAPI } from './components/Network/cartServices';
+import { addToCartAPI, getCartaPI } from './components/Network/cartServices';
 import setAuthToken from './components/Network/setAuthToken';
 import 'react-toastify/dist/ReactToastify.css'
 
@@ -29,11 +29,11 @@ const App = () => {
   }, [])
   const addToCart = (product, quantity) => {
     const updatedCart = [...cart]
-    const productIndex = updatedCart.findIndex((item) => item.product_id === product._id)
+    const productIndex = updatedCart.findIndex((item) => item.product._id === product._id);
     if(productIndex === -1) {
-      updatedCart.push({product: product, quantity: quantity})
+      updatedCart.push({product: product, quantity: quantity});
     } else {
-      updatedCart[productIndex].quantity += quantity
+      updatedCart[productIndex].quantity += quantity;
     }
     setCart(updatedCart)
     addToCartAPI(product._id, quantity)
@@ -46,12 +46,23 @@ const App = () => {
       setCart(cart)
     })
   }
+  const getCart = () => {
+    getCartaPI().then(response => {
+      setCart(response.data)
+    }).catch(error => {
+      console.log("App", "getCartaPI", error.response)
+      toast.error("Something went wrong!")
+    })
+  }
+  useEffect(() => {
+    if(user) getCart()
+  }, [user])
   return (
     <div className='app'>
-      <Navbar user={user} cartCount={cart.length} />
+      <Navbar user={user} cartCount={cart.length}  />
       <main>
         <ToastContainer position='top-right'/>
-        <Routing addToCart={addToCart}/>
+        <Routing addToCart={addToCart} cart={cart} />
       </main>
     </div>
   )
