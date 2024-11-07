@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useContext } from 'react'
 import './SingleProductPage.css'
 import Loader from '../Common/Loader'
 import QuantityInput from './QuantityInput';

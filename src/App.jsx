@@ -6,7 +6,7 @@ import './App.css';
 import Navbar from './components/NavBar/Navbar';
 import Routing from './components/Routing/Routing';
 import { getUser, getJwt } from './Network/userServices';
-import { addToCartAPI, getCartaPI, removeFromCartAPI } from './Network/cartServices';
+import { addToCartAPI, getCartaPI, removeFromCartAPI, increaseProductAPI, decreaseProductAPI } from './Network/cartServices';
 import setAuthToken from './Network/setAuthToken';
 import 'react-toastify/dist/ReactToastify.css'
 
@@ -48,7 +48,7 @@ const App = () => {
       setCart(cart)
     })
   }
-  const removeFromCart = id => {
+  const removeFromCart = (type, id) => {
     const oldCart = [...cart]
     const newCart = oldCart.filter(item => item.product._id !== id)
     setCart(newCart);
@@ -57,6 +57,29 @@ const App = () => {
       toast.error("Something went wrong!")
       setCart(oldCart);
     })
+  }
+  const updateCart = (type, id) => {
+    const oldCart = [...cart]
+    const updatedCart = [...cart]
+    const productIndex = updatedCart.findIndex(item => item.product._id === id)
+    if(type === "increase") {
+      updatedCart[productIndex].quantity += 1
+      setCart(updatedCart)
+      increaseProductAPI(id).catch(error => {
+        console.log("App", "increaseProductAPI", error.response)
+        toast.error("Something went wrong!")
+        setCart(oldCart);
+      })
+    }
+    if(type === "decrease") {
+      updatedCart[productIndex].quantity -= 1
+      setCart(updatedCart)
+      decreaseProductAPI(id).catch(error => {
+        console.log("App", "decreaseProductAPI", error.response)
+        toast.error("Something went wrong!")
+        setCart(oldCart);
+      })
+    }
   }
   const getCart = () => {
     getCartaPI().then(response => {
@@ -71,7 +94,7 @@ const App = () => {
   }, [user])
   return (
     <UserContext.Provider value={user}>
-      <CartContext.Provider value={{cart, addToCart: addToCart, removeFromCart: removeFromCart}}>
+      <CartContext.Provider value={{cart, addToCart: addToCart, removeFromCart: removeFromCart, updateCart: updateCart}}>
         <div className='app'>
           <Navbar/>
           <main>
