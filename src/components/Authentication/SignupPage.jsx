@@ -4,7 +4,7 @@ import { z } from "zod";
 import { zodResolver } from '@hookform/resolvers/zod'
 import "./SignupPage.css";
 import user from "../../assets/user.webp";
-import { signUp } from '../Network/userServices';
+import { signUp } from '../../Network/userServices';
 
 const schema = z.object({
     name: z.string().min(3, { message: "Name should be at least 3 characters." }),

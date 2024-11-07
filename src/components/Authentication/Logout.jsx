@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { logout } from '../Network/userServices'
+import { logout } from '../../Network/userServices'
 
 const Logout = () => {
     useEffect(() => {

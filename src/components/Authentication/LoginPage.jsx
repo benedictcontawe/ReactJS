@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { z } from "zod";
 import { zodResolver } from '@hookform/resolvers/zod'
 import './LoginPage.css';
-import { login } from '../Network/userServices';
+import { login } from '../../Network/userServices';
 
 const schema = z.object({
     email: z.string().email({ message: "Please enter valid email address." }).min(3),
