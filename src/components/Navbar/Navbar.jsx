@@ -15,21 +15,42 @@ import { getSuggestionsAPI } from '../../Network/productServices';
 const Navbar = () => {
   const [search, setSearch] = useState("")
   const [suggestions, setSuggestions] = useState([])
+  const [selectedSuggestion, setSelectedSuggestion] = useState(-1)
   const navigate = useNavigate()
   const user = useContext(UserContext)
   const { cart } = useContext(CartContext)
   const handleSubmit = (event) => {
+    console.log("NavBar", "handleSubmit");
     event.preventDefault()
     if(search.trim() !== "") {
       navigate(`/products?search=${search.trim()}`)
     }
     setSuggestions([])
   }
+  const onHandleKeyDown = (event) => {
+    console.log("NavBar", "onHandleKeyDown", event.key);
+    if(selectedSuggestion < suggestions.length && event.key === "ArrowDown") {
+      setSelectedSuggestion( currentIndex => 
+        currentIndex === suggestions.length - 1 ? 0 : currentIndex + 1
+      )
+    } else if(selectedSuggestion < suggestions.length && event.key === "ArrowUp") {
+      setSelectedSuggestion( currentIndex => 
+        currentIndex === 0 ? suggestions.length - 1 : currentIndex - 1
+      )
+    } else if(event.key === "Enter"  && selectedSuggestion > -1) {
+      const suggestion = suggestions[selectedSuggestion]
+      navigate(`/products?search=${suggestion.title}`)
+      setSearch("")
+      setSuggestions([])
+    } else {
+      setSelectedSuggestion(-1);
+    }
+  }
   useEffect(() => {
     if(search.trim() !== "") {
       getSuggestionsAPI(search)
       .then(response => setSuggestions(response.data))
-      .catch(error => console.log(error))
+      .catch(error => console.log("NavBar", "getSuggestionsAPI", error, search))
     } else if (search.trim() === "") {
       setSuggestions([])
     }
@@ -45,12 +66,15 @@ const Navbar = () => {
                   className='navbar_search' 
                   placeholder='Search Products' 
                   value={search}
-                  onChange={event => setSearch(event.target.value)} />
+                  onChange={event => setSearch(event.target.value)}
+                  onKeyDown={onHandleKeyDown} />
                 <button type='submit' className='search_button' >Search</button>
                 { suggestions.length > 0 &&
                 <ul className="search_result">
-                  { suggestions.map(suggestion => 
-                    <li className="search_suggestion_link" key={suggestion._id}>
+                  { suggestions.map((suggestion, index) => 
+                    <li 
+                      className={selectedSuggestion === index ? "search_suggestion_link active" : 'search_suggestion_link' }
+                      key={suggestion._id} >
                       <Link 
                         to={`/products?search=${suggestion.title}`} 
                         onClick={() => { 

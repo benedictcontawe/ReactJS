@@ -63,7 +63,8 @@
     cursor: pointer;
 }
 
-.search_suggestions_link:hover {
+.search_suggestions_link:hover,
+.search_suggestion_link.active {
     background-color: #E3E3E3;
 }
 
