@@ -1,47 +1,15 @@
 import React, { useEffect, useState } from "react";
 import apiClient from "../../utils/api-client";
 import Loader from "../Common/Loader";
+import { useQuery } from "@tanstack/react-query";
 
 const Sellers = () => {
+    const fetchSellers = () => apiClient.get("/users").then((response) => response.data )
+    const { data: sellers, error, isLoading } = useQuery({
+        queryKey: ["sellers"],
+        queryFn: fetchSellers
+    })
     const [name, setName] = useState("");
-    const [isLoading, setIsLoading] = useState(false)
-    const [errors, setErrors] = useState("")
-    const [sellers, setSellers] = useState([])
-    useEffect( () => {
-        fetchSellers();
-        /*
-        setIsLoading(true)
-        apiClient.get("/users")
-        .then((response) => {
-            console.log("Sellers", "apiClient.get", response);
-            setSellers(response.data);
-            setIsLoading(false);
-        }).catch((error) => {
-            console.log("Sellers", "apiClient.get", "catch error", error);
-            setIsLoading(false);
-            setErrors(error.message);
-        })
-        */
-    }, []);
-    const fetchSellers = async () => {
-        try {
-            setIsLoading(true)
-            const response = await apiClient.get("/users")
-            console.log("Sellers", "apiClient.get", response);
-            setSellers(response.data);
-            setIsLoading(false);
-        } catch (error) {
-            console.log("Sellers", "apiClient.get", "catch error", error);
-            setIsLoading(false);
-            setErrors(error.message);
-        }
-    }
-    useEffect(() => {
-      document.title = `Seller ${name}`
-        return () => {
-            console.log("Sellers", "Component Unmount")
-        }
-    }, [name])
     const addSeller = () => {
         const newSeller = {
             name: name,
@@ -94,11 +62,11 @@ const Sellers = () => {
         <input type="text" onChange={(event) => setName(event.target.value)}></input>
         <button onClick={addSeller}>Add Seller</button>
         { isLoading && <Loader/> }
-        { errors && <em>{errors}</em> }
+        { error && <em>{error.message}</em> }
         <table>
             <tbody> 
             { 
-                sellers.map( seller => 
+                sellers?.map( seller => 
                     <tr key={seller.id}>
                         <td>
                             {seller.name}
