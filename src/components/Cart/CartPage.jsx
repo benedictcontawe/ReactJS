@@ -1,4 +1,4 @@
-import React, { useMemo, useContext } from 'react'
+import React, { useMemo, useContext, memo } from 'react'
 import './CartPage.css'
 import remove from '../../assets/remove.png'
 import Table from '../Common/Table'
@@ -75,4 +75,4 @@ const CartPage = () => {
   )
 }
 
-export default CartPage
+export default memo(CartPage)
