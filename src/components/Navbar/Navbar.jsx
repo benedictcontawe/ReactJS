@@ -47,13 +47,16 @@ const Navbar = () => {
     }
   }
   useEffect(() => {
-    if(search.trim() !== "") {
-      getSuggestionsAPI(search)
-      .then(response => setSuggestions(response.data))
-      .catch(error => console.log("NavBar", "getSuggestionsAPI", error, search))
-    } else if (search.trim() === "") {
-      setSuggestions([])
-    }
+    const delaySugestions = setTimeout(() => {
+      if(search.trim() !== "") {
+        getSuggestionsAPI(search)
+        .then(response => setSuggestions(response.data))
+        .catch(error => console.log("NavBar", "getSuggestionsAPI", error, search))
+      } else if (search.trim() === "") {
+        setSuggestions([])
+      }
+    }, 300);
+    return () => clearTimeout(delaySugestions);
   }, [search])
   console.log("NavBar", suggestions)
   return (
