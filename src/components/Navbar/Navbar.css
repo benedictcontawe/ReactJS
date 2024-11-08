@@ -15,6 +15,7 @@
     border: 1px solid #CDCDCD;
     border-radius: 5px;
     padding: 3px;
+    position: relative; 
 }
 
 .navbar_search {
@@ -37,6 +38,33 @@
     background-color: #6457F9;
     color: #FFF;
     cursor: pointer;
+}
+
+.search_result {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    margin-top: 10px;
+    border: 1px solid #CDCDCD;
+    border-radius: 5px;
+    background-color: #FFF;
+    z-index: 9999;
+}
+
+.search_suggestion_link {
+    display: flex;
+}
+
+.search_suggestion_link > a {
+    width: 100%;
+    padding: 10px 20px;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+.search_suggestions_link:hover {
+    background-color: #E3E3E3;
 }
 
 .navbar_links {

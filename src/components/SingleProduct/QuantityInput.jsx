@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React from 'react';
 import './QuantityInput.css'
 
 const QuantityInput = ({quantity, setQuantity, stock, cartPage, productId}) => {
