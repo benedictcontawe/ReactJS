@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import './Navbar.css';
 import rocket from '../../assets/rocket.png';
 import star from '../../assets/glowing-star.png';
@@ -7,19 +7,32 @@ import memo from '../../assets/memo.png';
 import order from '../../assets/package.png';
 import lock from '../../assets/locked.png';
 import LinkWithIcon from './LinkWithIcon';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import UserContext from '../../contexts/UserContext';
 import CartContext from '../../contexts/CartContext';
 
 const Navbar = () => {
+  const [search, setSearch] = useState("")
+  const navigate = useNavigate()
   const user = useContext(UserContext)
   const { cart } = useContext(CartContext)
+  const handleSubmit = (event) => {
+    event.preventDefault()
+    if(search.trim() !== "") {
+      navigate(`/products?search=${search.trim()}`)
+    }
+  }
   return (
     <nav className='align_center navbar'>
         <div className='align_center'>
             <h1 className='navbar_heading'>CarWish</h1>
-            <form className='align_center navbar_form'>
-                <input type='text' className='navbar_search' placeholder='Search Products' />
+            <form className='align_center navbar_form' onSubmit={handleSubmit} >
+                <input 
+                  type='text' 
+                  className='navbar_search' 
+                  placeholder='Search Products' 
+                  value={search}
+                  onChange={event => setSearch(event.target.value)} />
                 <button type='submit' className='search_button' >Search</button>
             </form>
         </div>

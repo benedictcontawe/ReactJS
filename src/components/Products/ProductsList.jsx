@@ -10,11 +10,12 @@ const ProductsList = () => {
   const [search, setSearch] = useSearchParams();
   const category = search.get("category")
   const page = search.get("page")
+  const searchQuery = search.get("search")
   const { data, error, isLoading } = useData("/products", {
     params: { 
-      category: category, page: page
+      search: searchQuery, category: category, page: page
     }
-  }, [category, page])
+  }, [searchQuery, category, page])
   const skeletons = [1, 2, 3, 4, 5, 6, 7, 8]
   const handlePageChange = (page) => {
     const currentParams = Object.fromEntries([...search])
