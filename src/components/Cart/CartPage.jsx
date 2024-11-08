@@ -10,7 +10,7 @@ import { toast } from 'react-toastify'
 
 const CartPage = () => {
     const userObject = useContext(UserContext)
-    const { cart, removeFromCart, updateCart, setCart } = useContext(CartContext)
+    const { cart, removeFromCart, updateCart, dispatchCart } = useContext(CartContext)
     const subtotal = useMemo(() => {
         let total = 0;
         cart.forEach(item => {
@@ -20,14 +20,14 @@ const CartPage = () => {
     }, [cart])
     console.log("CartPage", cart, userObject)
     const checkout = () => {
-        const oldCart = [...cart]
-        setCart([])
+        dispatchCart({ type: "CHECKING_OUT_CART" });
         checkoutAPI().then(() => {
             console.log("CartPage", "checkoutAPI", "success ")
             toast.success("Oder placed sucessfully! ")
+            dispatchCart({ type: "CHECKED_OUT_CART" });
         }).catch(() => {
             toast.error("Something went wrong!")
-            setCart(oldCart)
+            dispatchCart({type: "REVERT_CART", payload: { cart: cart  } });
         })
     }
   return (
@@ -58,7 +58,7 @@ const CartPage = () => {
             <tbody>
                 <tr>
                     <td>Subtotal</td>
-                    <td>${subtotal}</td>
+                    <td>${subtotal.toFixed(2)}</td>
                 </tr>
                 <tr>
                     <td>Subtotal Charge</td>
@@ -66,7 +66,7 @@ const CartPage = () => {
                 </tr>
                 <tr className='cart_bill_final'>
                     <td>Total</td>
-                    <td>${subtotal + 5}</td>
+                    <td>${(subtotal + 5).toFixed(2)}</td>
                 </tr>
             </tbody>
         </table>
