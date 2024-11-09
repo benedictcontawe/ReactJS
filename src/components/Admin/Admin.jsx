@@ -14,6 +14,9 @@ const Admin = () => {
                     <Link to="/admin/sales">Sales</Link>
                 </li>
                 <li>
+                    <Link to="/admin/todos">Todos</Link>
+                </li>
+                <li>
                     <Link to="/admin/sellers">Sellers</Link>
                 </li>
             </ul>

@@ -8,7 +8,7 @@ const useTodos = (userId) => {
     const fetchTodos = () => apiClient
         .get("/todos", { params: parameters })
         .then((response) => response.data )
-    return useQuery({
+    return useQuery({ // users/1/todos
         queryKey: userId ? ["users", userId, "todos"] : ["todos"],
         queryFn: fetchTodos,
     });
