@@ -1,23 +1,34 @@
 import React, { useState } from "react";
 import Loader from "../Common/Loader";
 import useSellers from "../../hooks/useSellers";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import apiClient from "../../utils/api-client";
 
 const Sellers = () => {
     const { data: sellers, error, isLoading } = useSellers();
+    const queryClient = useQueryClient();
+    const addSellerMutation = useMutation({
+        mutationFn: (newSeller) => apiClient.post("/users", newSeller).then(response => response.data),
+        onSuccess: (savedSeller, newSeller) => {
+            /* Method 1: Invalid cahced data
+            queryClient.invalidateQueries({
+                queryKey: ["sellers"],
+            })
+            Method 2: Update the cached data */
+            queryClient.setQueryData(["sellers"], (sellers) => [
+                savedSeller, 
+                ...sellers,
+           ])
+        },
+        onError: null,
+    } )
     const [name, setName] = useState("");
     const addSeller = () => {
         const newSeller = {
             name: name,
             id: sellers.length + 1,
         };
-        setSellers([newSeller, ...sellers]);
-        apiClient.post("/users", newSeller)
-        .then((response) => setSellers([response.data, ...sellers]))
-        .catch((error) => {
-            console.log("Sellers", "apiClient.post", "catch error", error);
-            setErrors(error.message);
-            setSellers(sellers);
-        });
+        addSellerMutation.mutate(newSeller)
     };
     const updateSeller = (seller) => {
         const updatedSeller = {
