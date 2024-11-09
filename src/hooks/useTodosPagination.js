@@ -4,7 +4,7 @@ import apiClient from "../utils/api-client";
 const useTodosPagination = (query) => {
     const parameters = {
         _limit: query.pageSize,
-        _start: (query.page -1 ) * query.pageSize,
+        _start: (query.page - 1 ) * query.pageSize,
     };
     const fetchTodos = () => apiClient
         .get("/todos", { params: parameters })

@@ -14,7 +14,10 @@ const Admin = () => {
                     <Link to="/admin/sales">Sales</Link>
                 </li>
                 <li>
-                    <Link to="/admin/todos">Todos</Link>
+                    <Link to="/admin/todos_pagination">Todos Manual Pagination</Link>
+                </li>
+                <li>
+                    <Link to="/admin/todos_scroll">Todos Infinite Query Pagination</Link>
                 </li>
                 <li>
                     <Link to="/admin/sellers">Sellers</Link>
