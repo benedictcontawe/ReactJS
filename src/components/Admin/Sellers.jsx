@@ -1,14 +1,9 @@
-import React, { useEffect, useState } from "react";
-import apiClient from "../../utils/api-client";
+import React, { useState } from "react";
 import Loader from "../Common/Loader";
-import { useQuery } from "@tanstack/react-query";
+import useSellers from "../../hooks/useSellers";
 
 const Sellers = () => {
-    const fetchSellers = () => apiClient.get("/users").then((response) => response.data )
-    const { data: sellers, error, isLoading } = useQuery({
-        queryKey: ["sellers"],
-        queryFn: fetchSellers
-    })
+    const { data: sellers, error, isLoading } = useSellers();
     const [name, setName] = useState("");
     const addSeller = () => {
         const newSeller = {
