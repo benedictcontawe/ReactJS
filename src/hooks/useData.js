@@ -1,23 +1,13 @@
-import { useEffect, useState } from 'react'    
 import apiClient from '../Network/api-client'
+import { useQuery } from '@tanstack/react-query'
 
-const useData = (endPoint, customConfig, dependencyList) => {
-    const [data, setData] = useState(null)
-    const [error, setError] = useState("")
-    const [isLoading, setIsLoading] = useState(false)
-    useEffect(() => {
-      setIsLoading(true)
-      apiClient.get(endPoint, customConfig)
-      .then(response => {
-        setData(response.data)
-        setIsLoading(false)
-      })
-      .catch(error => {
-        setError(error.message)
-        setIsLoading(false)
-      })
-    }, dependencyList ? dependencyList : [])
-    return { data, error, isLoading }
+const useData = (endPoint, customConfig = {}, queryKey, staleTime = 300_00) => {
+  const fetchFunction = () => apiClient.get(endPoint, customConfig).then(response => response.data);
+    return useQuery( {
+      queryKey: queryKey,
+      queryFn: fetchFunction,
+      staleTime: staleTime,
+    } )
 }
 
 export default useData

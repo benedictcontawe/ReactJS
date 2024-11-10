@@ -13,7 +13,7 @@ const SingleProductPage = () => {
     const { addToCart } = useContext(CartContext)
     const user = useContext(UserContext)
     const { id } = useParams()
-    const { data: product, error, isLoading } = useData(`/products/${id}`)
+    const { data: product, error, isLoading } = useData(`/products/${id}`, null, ["products", id])
     console.log("SingleProductPage", product, error, isLoading)
     return (
     <section className='align_center single_product'>
