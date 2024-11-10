@@ -5,6 +5,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import apiClient from "../../utils/api-client";
 
 const Sellers = () => {
+    const [name, setName] = useState("");
     const { data: sellers, error, isLoading } = useSellers();
     const queryClient = useQueryClient();
     const addSellerMutation = useMutation({
@@ -22,7 +23,20 @@ const Sellers = () => {
         },
         onError: null,
     } )
-    const [name, setName] = useState("");
+
+    const deleteSellerMutation = useMutation ( {
+        mutationFn: (id) => apiClient.delete(`/users/${id}`).then((response) => response.data)     
+    } )
+
+    const updateSellerMutation = useMutation( {
+        mutationFn: (updatedSeller) => apiClient.patch(`/users/${updatedSeller.id}`, updatedSeller).then((response) => { return response.data }),
+        onSuccess: (updatedSeller) => {
+            queryClient.setQueryData(["sellers"], (sellers) => sellers.map((mapSeller) =>
+                mapSeller.id === updatedSeller.id ? updatedSeller : mapSeller
+            ) )
+        }
+    } )
+
     const addSeller = () => {
         const newSeller = {
             name: name,
@@ -30,40 +44,25 @@ const Sellers = () => {
         };
         addSellerMutation.mutate(newSeller)
     };
+
     const updateSeller = (seller) => {
         const updatedSeller = {
             ...seller, name: seller.name + " Updated"
         }
-        setSellers(
-            sellers.map((mapSeller) =>
-                mapSeller.id === seller.id ? updatedSeller : mapSeller
-            )
-        );
-        apiClient.patch(`/users/${seller.id}`, updatedSeller)
-        .then((response) => {
-            console.log("Sellers", "apiClient.patch", response.data)
-        })
-        .catch((error) => {
-            console.log("Sellers", "apiClient.patch", "catch error", error);
-            setErrors(error.message);
-            setSellers(sellers);
-        });
+        updateSellerMutation.mutate(updatedSeller)
     }
+
     const deleteSeller = (id) => {
-        setSellers(sellers.filter((seller) => seller.id !== id));
-        apiClient.delete(`/users/${id}`)
-        .then((response) => {
-            console.log("Sellers", "apiClient.delete", response.data)
+        deleteSellerMutation.mutate(id, {
+            onSuccess: () => {
+                queryClient.setQueryData(["sellers"], (sellers) => sellers.filter(seller => seller.id !== id))
+            }
         })
-        .catch((error) => {
-            console.log("Sellers", "apiClient.delete", "catch error", error);
-            setErrors(error.message);
-            setSellers(sellers);
-        });
     }
+
     if(isLoading) return <Loader/>
     return (
-        <>
+        <React.Fragment>
         <h3>Admin Sellers Page</h3>
         <input type="text" onChange={(event) => setName(event.target.value)}></input>
         <button onClick={addSeller}>Add Seller</button>
@@ -88,7 +87,7 @@ const Sellers = () => {
             }
             </tbody>
         </table>
-        </>
+        </React.Fragment>
     );
 };
 
