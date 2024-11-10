@@ -67,7 +67,7 @@ const Sellers = () => {
         <React.Fragment>
         <h3>Admin Sellers Page</h3>
         <input type="text" onChange={(event) => setName(event.target.value)}></input>
-        <button onClick={addSeller}>Add Seller</button>
+        <button disabled={addSellerMutation.isPending} onClick={addSeller}>{addSellerMutation.isPending ? "Adding Seller" : "Add Seller"}</button>
         { isLoading && <Loader/> }
         { error && <em>{error.message}</em> }
         { addSellerMutation.error && <em>{addSellerMutation.error.message}</em> }
