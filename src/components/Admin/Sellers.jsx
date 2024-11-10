@@ -8,7 +8,7 @@ const Sellers = () => {
     const [name, setName] = useState("");
     const { data: sellers, error, isLoading } = useSellers();
     const queryClient = useQueryClient();
-    const addSellerMutation = useMutation({
+    const addSellerMutation = useMutation ( {
         mutationFn: (newSeller) => apiClient.post("/users", newSeller).then(response => response.data),
         onSuccess: (savedSeller, newSeller) => {
             /* Method 1: Invalid cahced data
@@ -21,20 +21,22 @@ const Sellers = () => {
                 ...sellers,
            ])
         },
-        onError: null,
+        onError: error => { console.log("Sellers", "addSellerMutation", "onError", error) }, 
     } )
 
     const deleteSellerMutation = useMutation ( {
-        mutationFn: (id) => apiClient.delete(`/users/${id}`).then((response) => response.data)     
+        mutationFn: (id) => apiClient.delete(`/users/${id}`).then((response) => response.data),
+        onError: error => console.log("Sellers", "deleteSellerMutation", "onError", error), 
     } )
 
-    const updateSellerMutation = useMutation( {
+    const updateSellerMutation = useMutation ( {
         mutationFn: (updatedSeller) => apiClient.patch(`/users/${updatedSeller.id}`, updatedSeller).then((response) => { return response.data }),
         onSuccess: (updatedSeller) => {
             queryClient.setQueryData(["sellers"], (sellers) => sellers.map((mapSeller) =>
                 mapSeller.id === updatedSeller.id ? updatedSeller : mapSeller
             ) )
-        }
+        },
+        onError: error => console.log("Sellers", "updateSellerMutation", "onError", error), 
     } )
 
     const addSeller = () => {
@@ -68,6 +70,7 @@ const Sellers = () => {
         <button onClick={addSeller}>Add Seller</button>
         { isLoading && <Loader/> }
         { error && <em>{error.message}</em> }
+        { addSellerMutation.error && <em>{addSellerMutation.error.message}</em> }
         <table>
             <tbody> 
             { 
