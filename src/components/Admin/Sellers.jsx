@@ -1,59 +1,18 @@
 import React, { useState } from "react";
 import Loader from "../Common/Loader";
 import useSellers from "../../hooks/useSellers";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import apiClient from "../../utils/api-client";
+import { useQueryClient } from "@tanstack/react-query";
+import useAddSeller from "../../hooks/useAddSeller";
+import useDeleteSeller from "../../hooks/useDeleteSeller";
+import useUpdateSeller from "../../hooks/useUpdateSeller";
 
 const Sellers = () => {
     const [name, setName] = useState("");
     const { data: sellers, error, isLoading } = useSellers();
     const queryClient = useQueryClient();
-    const addSellerMutation = useMutation ( {
-        mutationFn: (newSeller) => apiClient.post("/userss", newSeller).then(response => response.data),
-        onMutate: (newSeller) => {
-            console.log("Sellers", "addSellerMutation", "onMutate", newSeller)
-            const previousSellers = queryClient.getQueryData(["sellers"])
-            queryClient.setQueryData(["sellers"], (sellers) => [
-                newSeller, 
-                ...sellers,
-           ])
-           return { previousSellers }
-        },
-        onSuccess: (savedSeller, newSeller) => {
-            /* Method 1: Invalid cahced data, Not working
-            queryClient.invalidateQueries({
-                queryKey: ["sellers"],
-            })
-            Method 2: Update the cached data, working for Pessemistic Approach
-            queryClient.setQueryData(["sellers"], (sellers) => [
-                savedSeller, 
-                ...sellers,
-           ])
-            */
-           queryClient.setQueriesData(["sellers", (sellers) => sellers?.map(seller => seller === newSeller ? savedSeller : seller)])
-        },
-        onError: (error, newSeller, context) => { console.log("Sellers", "addSellerMutation", "onError", error) 
-            if(!context) {
-                return;
-            }
-            queryClient.setQueryData(["sellers"], context.previousSellers)
-        }, 
-    } )
-
-    const deleteSellerMutation = useMutation ( {
-        mutationFn: (id) => apiClient.delete(`/users/${id}`).then((response) => response.data),
-        onError: error => console.log("Sellers", "deleteSellerMutation", "onError", error), 
-    } )
-
-    const updateSellerMutation = useMutation ( {
-        mutationFn: (updatedSeller) => apiClient.patch(`/users/${updatedSeller.id}`, updatedSeller).then((response) => { return response.data }),
-        onSuccess: (updatedSeller) => {
-            queryClient.setQueryData(["sellers"], (sellers) => sellers.map((mapSeller) =>
-                mapSeller.id === updatedSeller.id ? updatedSeller : mapSeller
-            ) )
-        },
-        onError: error => console.log("Sellers", "updateSellerMutation", "onError", error), 
-    } )
+    const addSellerMutation = useAddSeller();
+    const deleteSellerMutation = useDeleteSeller()
+    const updateSellerMutation = useUpdateSeller()
 
     const addSeller = () => {
         const newSeller = {
@@ -61,6 +20,7 @@ const Sellers = () => {
             id: sellers.length + 1,
         };
         addSellerMutation.mutate(newSeller)
+        setName("")
     };
 
     const updateSeller = (seller) => {
@@ -82,7 +42,7 @@ const Sellers = () => {
     return (
         <React.Fragment>
         <h3>Admin Sellers Page</h3>
-        <input type="text" onChange={(event) => setName(event.target.value)}></input>
+        <input type="text" onChange={(event) => setName(event.target.value)} value={name}></input>
         <button disabled={addSellerMutation.isPending} onClick={addSeller}>{addSellerMutation.isPending ? "Adding Seller" : "Add Seller"}</button>
         { isLoading && <Loader/> }
         { error && <em>{error.message}</em> }
