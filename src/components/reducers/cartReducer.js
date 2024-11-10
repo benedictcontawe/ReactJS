@@ -4,7 +4,10 @@ const cartReducer = (cart, action) => {
             const updatedCart = [...cart];
             const { product, quantity } = action.payload;
             const productIndex = updatedCart.findIndex (
-            (item) => item.product._id === product._id
+                (item) => {
+                    console.log("ADD_TO_CART", item)
+                    return item._id === product._id
+                }
             );
             if (productIndex === -1) {
                 updatedCart.push({ product: product, quantity: quantity });

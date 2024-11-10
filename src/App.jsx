@@ -5,7 +5,7 @@ import CartContext from './contexts/CartContext';
 import './App.css';
 import Navbar from './components/NavBar/Navbar';
 import Routing from './components/Routing/Routing';
-import { getUser, getJwt } from './Network/userServices';
+import { getUser, getJwt, logout } from './Network/userServices';
 import { addToCartAPI, getCartaPI, removeFromCartAPI, increaseProductAPI, decreaseProductAPI } from './Network/cartServices';
 import setAuthToken from './Network/setAuthToken';
 import 'react-toastify/dist/ReactToastify.css'
@@ -26,8 +26,9 @@ const App = () => {
       } else {
         setUser(jwtUser);
       }
+      console.log("App user", user);
     } catch (error) {
-      console.log("App error", error);
+      console.log("App user error", error);
     }
   }, [])
   const addToCart = useCallback((product, quantity) => {

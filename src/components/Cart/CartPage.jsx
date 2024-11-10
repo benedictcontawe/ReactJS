@@ -11,10 +11,12 @@ import { toast } from 'react-toastify'
 const CartPage = () => {
     const userObject = useContext(UserContext)
     const { cart, removeFromCart, updateCart, dispatchCart } = useContext(CartContext)
+    console.log("CartPage", "cart", cart , "cart.lenght", cart.length)
     const subtotal = useMemo(() => {
         let total = 0;
         cart.forEach(item => {
-            total += item.product.price * item.quantity
+            console.log("CartPage", "item", item)
+            return total += item.product.price * item.quantity
         });
         return total;
     }, [cart])
