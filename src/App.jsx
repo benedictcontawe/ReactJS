@@ -44,25 +44,17 @@ const App = () => {
     }
   }, [])
   const addToCart = useCallback((product, quantity) => {
+    dispatchCart({type: "ADD_TO_CART", payload: {product: product, quantity: quantity}})
     addToCartMutation.mutate({id: product._id, quantity: quantity}, {
+      onSuccess: () => {
+        toast.success("Product Added Successfully!")
+      },
       onError: () => {
         console.log("App", "addToCartAPI", error.response)
         toast.error("Failed to add product!")
         dispatchCart({type: "REVERT_CART", payload: { cart: cart  } });
       }
     })
-    /* 
-    dispatchCart({type: "ADD_TO_CART", payload: {product: product, quantity: quantity}})
-    addToCartAPI(product._id, quantity)
-    .then(response => {
-      console.log("App", "addToCartAPI", response.data)
-      toast.success("Product Added Successfully!")
-    }).catch(error => {
-      console.log("App", "addToCartAPI", error.response)
-      toast.error("Failed to add product!")
-      dispatchCart({type: "REVERT_CART", payload: { cart: cart  } });
-    })
-    */
   }, [cart])
   const removeFromCart = useCallback((id) => {
     dispatchCart({type: "REMOVE_FROM_CART", payload: { id: id }})
