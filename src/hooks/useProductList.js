@@ -1,7 +1,7 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import apiClient from "../Network/api-client";
 
-const useProductList = (query) => {
+const useProductList = (query) => { 
     const fetchFunction = ({pageParam = 1}) => apiClient
     .get("/products", {params: {... query, page: pageParam}})
     .then(response => response.data);
