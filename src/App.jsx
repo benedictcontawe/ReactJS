@@ -6,16 +6,26 @@ import './App.css';
 import Navbar from './components/NavBar/Navbar';
 import Routing from './components/Routing/Routing';
 import { getUser, getJwt, logout } from './Network/userServices';
-import { addToCartAPI, getCartaPI, removeFromCartAPI, increaseProductAPI, decreaseProductAPI } from './Network/cartServices';
+import { addToCartAPI, removeFromCartAPI, increaseProductAPI, decreaseProductAPI } from './Network/cartServices';
 import setAuthToken from './Network/setAuthToken';
 import 'react-toastify/dist/ReactToastify.css'
 import cartReducer from './components/reducers/cartReducer';
+import useData from './hooks/useData';
 
 setAuthToken(getJwt());
 
 const App = () => {
   const [user, setUser] = useState(null)
   const [cart, dispatchCart] = useReducer(cartReducer, []);
+  const {data: cartData, refetch} = useData("/cart", null, ["cart"])
+  useEffect(() => {
+    if(cartData) {
+      dispatchCart({type: "GET_CART", payload: { products: cartData } });
+    }
+  }, [cartData]);
+  useEffect(() => {
+    if(user) refetch()
+  }, [user]);
   useEffect(() => {
     try {
       const jwtUser = getUser();
@@ -73,17 +83,6 @@ const App = () => {
       })
     }
   }, [cart])
-  const getCart = useCallback(() => {
-    getCartaPI().then(response => {
-      dispatchCart({type: "GET_CART", payload: { products: response.data } });
-    }).catch(error => {
-      console.log("App", "getCartaPI", error.response)
-      toast.error("Something went wrong!")
-    })
-  }, [user])
-  useEffect(() => {
-    if(user) getCart()
-  }, [user])
   return (
     <UserContext.Provider value={user}>
       <CartContext.Provider value={{cart, addToCart: addToCart, removeFromCart: removeFromCart, updateCart: updateCart, dispatchCart: dispatchCart}}>
