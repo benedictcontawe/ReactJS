@@ -6,12 +6,13 @@ import './App.css';
 import Navbar from './components/NavBar/Navbar';
 import Routing from './components/Routing/Routing';
 import { getUser, getJwt, logout } from './Network/userServices';
-import { removeFromCartAPI, increaseProductAPI, decreaseProductAPI } from './Network/cartServices';
+import { increaseProductAPI, decreaseProductAPI } from './Network/cartServices';
 import setAuthToken from './Network/setAuthToken';
 import 'react-toastify/dist/ReactToastify.css'
 import cartReducer from './reducers/cartReducer';
 import useData from './hooks/useData';
 import useAddToCart from './hooks/useAddToCart';
+import useRemoveFromCart from './hooks/useRemoveFromCart';
 
 setAuthToken(getJwt());
 
@@ -20,6 +21,7 @@ const App = () => {
   const [cart, dispatchCart] = useReducer(cartReducer, []);
   const {data: cartData, refetch} = useData("/cart", null, ["cart"])
   const addToCartMutation = useAddToCart();
+  const removeFromCartMutation = useRemoveFromCart();
   useEffect(() => {
     if(cartData) {
       dispatchCart({type: "GET_CART", payload: { products: cartData } });
@@ -50,7 +52,7 @@ const App = () => {
         toast.success("Product Added Successfully!")
       },
       onError: () => {
-        console.log("App", "addToCartAPI", error.response)
+        console.log("App", "addToCart", error.response)
         toast.error("Failed to add product!")
         dispatchCart({type: "REVERT_CART", payload: { cart: cart  } });
       }
@@ -58,11 +60,16 @@ const App = () => {
   }, [cart])
   const removeFromCart = useCallback((id) => {
     dispatchCart({type: "REMOVE_FROM_CART", payload: { id: id }})
-    removeFromCartAPI(id).catch(error => {
-      console.log("App", "removeFromCartAPI", error.response)
-      toast.error("Something went wrong!")
-      dispatchCart({type: "REVERT_CART", payload: { cart: cart  } });
-    })
+    removeFromCartMutation.mutate({id: id}, {
+      onSuccess: () => {
+        console.log("App", "removeFromCart", "onSuccess")
+      },
+      onError: () => {
+        console.log("App", "removeFromCart", error.response)
+        toast.error("Something went wrong!")
+        dispatchCart({type: "REVERT_CART", payload: { cart: cart  } });
+      }
+    } )
   }, [cart])
   const updateCart = useCallback((type, id) => {
     const updatedCart = [...cart]

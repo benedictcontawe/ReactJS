@@ -1,9 +1,5 @@
 import apiClient from "./api-client";
 
-export function removeFromCartAPI(id) {
-    return apiClient.patch(`/cart/remove/${id}`)
-}
-
 export function increaseProductAPI(id) {
     return apiClient.patch(`/cart/increase/${id}`)
 }
