@@ -6,11 +6,12 @@ import './App.css';
 import Navbar from './components/NavBar/Navbar';
 import Routing from './components/Routing/Routing';
 import { getUser, getJwt, logout } from './Network/userServices';
-import { addToCartAPI, removeFromCartAPI, increaseProductAPI, decreaseProductAPI } from './Network/cartServices';
+import { removeFromCartAPI, increaseProductAPI, decreaseProductAPI } from './Network/cartServices';
 import setAuthToken from './Network/setAuthToken';
 import 'react-toastify/dist/ReactToastify.css'
-import cartReducer from './components/reducers/cartReducer';
+import cartReducer from './reducers/cartReducer';
 import useData from './hooks/useData';
+import useAddToCart from './hooks/useAddToCart';
 
 setAuthToken(getJwt());
 
@@ -18,6 +19,7 @@ const App = () => {
   const [user, setUser] = useState(null)
   const [cart, dispatchCart] = useReducer(cartReducer, []);
   const {data: cartData, refetch} = useData("/cart", null, ["cart"])
+  const addToCartMutation = useAddToCart();
   useEffect(() => {
     if(cartData) {
       dispatchCart({type: "GET_CART", payload: { products: cartData } });
@@ -42,6 +44,14 @@ const App = () => {
     }
   }, [])
   const addToCart = useCallback((product, quantity) => {
+    addToCartMutation.mutate({id: product._id, quantity: quantity}, {
+      onError: () => {
+        console.log("App", "addToCartAPI", error.response)
+        toast.error("Failed to add product!")
+        dispatchCart({type: "REVERT_CART", payload: { cart: cart  } });
+      }
+    })
+    /* 
     dispatchCart({type: "ADD_TO_CART", payload: {product: product, quantity: quantity}})
     addToCartAPI(product._id, quantity)
     .then(response => {
@@ -52,6 +62,7 @@ const App = () => {
       toast.error("Failed to add product!")
       dispatchCart({type: "REVERT_CART", payload: { cart: cart  } });
     })
+    */
   }, [cart])
   const removeFromCart = useCallback((id) => {
     dispatchCart({type: "REMOVE_FROM_CART", payload: { id: id }})
