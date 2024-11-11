@@ -6,13 +6,13 @@ import './App.css';
 import Navbar from './components/NavBar/Navbar';
 import Routing from './components/Routing/Routing';
 import { getUser, getJwt, logout } from './Network/userServices';
-import { increaseProductAPI, decreaseProductAPI } from './Network/cartServices';
 import setAuthToken from './Network/setAuthToken';
 import 'react-toastify/dist/ReactToastify.css'
 import cartReducer from './reducers/cartReducer';
 import useData from './hooks/useData';
 import useAddToCart from './hooks/useAddToCart';
 import useRemoveFromCart from './hooks/useRemoveFromCart';
+import useUpdateCart from './hooks/useUpdateCart';
 
 setAuthToken(getJwt());
 
@@ -22,6 +22,7 @@ const App = () => {
   const {data: cartData, refetch} = useData("/cart", null, ["cart"])
   const addToCartMutation = useAddToCart();
   const removeFromCartMutation = useRemoveFromCart();
+  const updateCartMutation = useUpdateCart()
   useEffect(() => {
     if(cartData) {
       dispatchCart({type: "GET_CART", payload: { products: cartData } });
@@ -76,22 +77,18 @@ const App = () => {
     const productIndex = updatedCart.findIndex(item => item.product._id === id)
     if(type === "increase") {
       updatedCart[productIndex].quantity += 1
-      dispatchCart({ type: "GET_CART", payload: { products: updatedCart } });
-      increaseProductAPI(id).catch(error => {
-        console.log("App", "increaseProductAPI", error.response)
-        toast.error("Something went wrong!")
-        dispatchCart({type: "REVERT_CART", payload: { cart: cart  } });
-      })
     }
     if(type === "decrease") {
       updatedCart[productIndex].quantity -= 1
-      dispatchCart({ type: "GET_CART", payload: { products: updatedCart } });
-      decreaseProductAPI(id).catch(error => {
-        console.log("App", "decreaseProductAPI", error.response)
+    }
+    dispatchCart({ type: "GET_CART", payload: { products: updatedCart } });
+    updateCartMutation.mutate({id, type}, {
+      onError: () => {
+        console.log("App", "update type", error.response)
         toast.error("Something went wrong!")
         dispatchCart({type: "REVERT_CART", payload: { cart: cart  } });
-      })
-    }
+      }
+    })
   }, [cart])
   return (
     <UserContext.Provider value={user}>

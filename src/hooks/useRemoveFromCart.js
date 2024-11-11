@@ -5,7 +5,7 @@ const useRemoveFromCart = () => {
     const queryClient = useQueryClient()
     return useMutation({
         mutationFn: ({id}) => apiClient.patch(`/cart/remove/${id}`).then(response => response.data),
-        onSuccess:() => {
+        onSuccess: () => {
             console.log("useRemoveFromCart", "onSuccess")
             queryClient.invalidateQueries({
                 queryKey: ["cart"]
