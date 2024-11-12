@@ -6,6 +6,7 @@ import { useParams } from 'react-router-dom';
 import useData from '../../hooks/useData';
 import UserContext from '../../contexts/UserContext';
 import CartContext from '../../contexts/CartContext';
+import config from '../../Network/config.json'
 
 const SingleProductPage = () => {
     const [selectedImage, setSelectedImage] = useState(0)
@@ -24,7 +25,7 @@ const SingleProductPage = () => {
             <div className="single_product_thumbnails">
                 { product.images.map( (image, index) => 
                     <img 
-                        src={`http://localhost:8000/products/${image}`}
+                        src={`${config.back_end_url}/products/${image}`}
                         alt={product.title}  
                         onClick={() => setSelectedImage(index)} 
                         className={selectedImage === index ? "selected_image" : ""
@@ -32,7 +33,7 @@ const SingleProductPage = () => {
                 ) }
             </div>
             <img 
-                src={`http://localhost:8000/products/${product.images[selectedImage]}`} 
+                src={`${config.back_end_url}/products/${product.images[selectedImage]}`} 
                 alt={product.title} 
                 className='single_product_display' 
             />

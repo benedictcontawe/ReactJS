@@ -1,5 +1,6 @@
 import axios from "axios";
+import config from '../Network/config.json'
 
 export default axios.create( {
-    baseURL: "http://localhost:8000/api"
+    baseURL: `${config.back_end_url}/api`,
 } )
