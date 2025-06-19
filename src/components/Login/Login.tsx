@@ -1,16 +1,26 @@
 import React, { useState } from 'react'
 import './Login.css'
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { supabase } from '../../supabaseClient';
 
 const Login = () => {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
-  const handleSubmit = (e: React.FormEvent) => {
+  const navigate = useNavigate();
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Login attempt with:', { email, password });
-    alert(`Login attempted for: ${email}`);
-    setEmail('');
-    setPassword('');
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    if (error) {
+      console.error('Login error:', error);
+      alert(`Login failed: ${error.message}`);
+    } else {
+      console.log('Login successful', data);
+      alert('Login successful!');
+      navigate('/blogs');
+    }
   };
   return (
     <div className="auth-container">

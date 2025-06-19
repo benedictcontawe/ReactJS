@@ -1,16 +1,26 @@
 import React, { useState } from 'react'
 import './Register.css'
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { supabase } from '../../supabaseClient';
 
 const Register = () => {
   const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
-    const handleSubmit = (e: React.FormEvent) => {
+    const navigate = useNavigate();
+    const handleSubmit = async (e: React.FormEvent) => {
       e.preventDefault();
-      console.log('Register attempt with:', { email, password });
-      alert(`Register attempted for: ${email}`);
-      setEmail('');
-      setPassword('');
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+      });
+      if (error) {
+        console.error('Registration error:', error);
+        alert(`Registration failed: ${error.message}`);
+      } else {
+        console.log('Registration successful', data);
+        alert('Registration successful! Please check your email to confirm.');
+        navigate('/login');
+      }
     };
     return (
       <div className="auth-container">
