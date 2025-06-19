@@ -1,25 +1,36 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { supabase } from './supabaseClient';
 import './App.css'
 import Card from './components/Card/Card'
 import AddDialog from './components/AddDialog/AddDialog';
 import EditDialog from './components/EditDialog/EditDialog';
-
+interface BlogPost {
+  id: number;
+  title: string;
+  content: string;
+}
 function App() {
-  const [items, setItems] = useState([
-    { title: 'First Blog Post', content: 'This is the content of the first blog post.' },
-    { title: 'Second Blog Post', content: 'This is the content of the second blog post.' },
-    { title: 'Third Blog Post', content: 'This is the content of the third blog post.' },
-    { title: 'Fourth Blog Post', content: 'This is the content of the fourth blog post.' },
-    { title: 'Fifth Blog Post', content: 'This is the content of the fifth blog post.' },
-    { title: 'Sixth Blog Post', content: 'This is the content of the sixth blog post.' },
-    { title: 'Seventh Blog Post', content: 'This is the content of the seventh blog post.' },
-    { title: 'Eighth Blog Post', content: 'This is the content of the eighth blog post.' },
-    { title: 'Ninth Blog Post', content: 'This is the content of the ninth blog post.' },
-    { title: 'Tenth Blog Post', content: 'This is the content of the tenth blog post.' },
-  ]);
+  const [items, setItems] = useState<BlogPost[]>([]);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editItemIndex, setEditItemIndex] = useState<number | null>(null);
+  useEffect(() => {
+    const fetchPosts = async () => {
+      console.log('Fetching...');
+      const { data, error } = await supabase
+        .from('posts')
+        .select('*')
+        .order('created_at', { ascending: true });
+
+      if (error) {
+        console.error('Fetch error:', error);
+      } else {
+        console.log('Fetched', data);
+        setItems(data || []);
+      }
+    };
+    fetchPosts();
+  }, [])
   const handleFabClick = () => {
     //alert('FAB Clicked!');
     setShowAddModal(true);
@@ -28,29 +39,56 @@ function App() {
   const handleCloseModal = () => {
     setShowAddModal(false);
   };
-  const handleAddNewItem = (newItem: { title: string; content: string }) => {
-    //setItems(prevItems => [...prevItems, newItem]);
-    setItems(prevItems => [newItem, ...prevItems]);
-    setShowAddModal(false);
+  const handleAddNewItem = async (newItem: { title: string; content: string }) => {
+    console.log('Appending...');
+    const { data, error } = await supabase
+      .from('posts')
+      .insert([newItem])
+      .select();
+
+    if (error) {
+      console.error('Insert error:', error);
+    } else if (data && data[0]) {
+      console.log('Insert Done');
+      setItems(prevItems => [data[0], ...prevItems]);
+      setShowAddModal(false);
+    }
   };
   const handleEditItem = (indexToEdit: number) => {
     setEditItemIndex(indexToEdit);
     setShowEditModal(true);
   };
-  const handleDeleteItem = (indexToDelete: number) => {
+  const handleDeleteItem = async (indexToDelete: number) => {
+    const id = items[indexToDelete].id;
     if (window.confirm(`Are you sure you want to delete "${items[indexToDelete].title}"?`)) {
-      setItems(prevItems => prevItems.filter((_, i) => i !== indexToDelete));
+      const { error } = await supabase.from('posts').delete().eq('id', id);
+      if (error) {
+        console.error('Delete error:', error);
+      } else {
+        setItems(prevItems => prevItems.filter((_, i) => i !== indexToDelete));
+      }
     }
   };
-  const handleSaveEditedItem = (updatedItem: { title: string; content: string }) => {
+  const handleSaveEditedItem = async (updatedItem: { title: string; content: string }) => {
     if (editItemIndex !== null) {
-      setItems(prevItems => {
-        const updatedItems = [...prevItems];
-        updatedItems[editItemIndex] = updatedItem;
-        return updatedItems;
-      });
-      setEditItemIndex(null);
-      setShowEditModal(false);
+      const id = items[editItemIndex].id;
+      const { data, error } = await supabase
+        .from('posts')
+        .update(updatedItem)
+        .eq('id', id)
+        .select();
+
+      if (error) {
+        console.error('Update error:', error);
+      } else if (data && data[0]) {
+        setItems(prev => {
+          const copy = [...prev];
+          copy[editItemIndex] = data[0];
+          return copy;
+        });
+        setEditItemIndex(null);
+        setShowEditModal(false);
+      }
     }
   };
   return (
