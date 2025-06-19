@@ -7,29 +7,3 @@
   min-height: 100vh;
   padding-bottom: 80px;
 }
-
-.fab {
-  position: fixed;
-  bottom: 24px; /* Distance from the bottom of the viewport */
-  right: 24px;  /* Distance from the right of the viewport */
-  /* Remove 'left: 50%;' and 'transform: translateX(-50%);' */
-  width: 56px;
-  height: 56px;
-  background-color: #0077cc;
-  color: white;
-  border: none;
-  border-radius: 50%;
-  font-size: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-  padding: 0;
-  z-index: 1000; /* Good practice for fixed elements */
-}
-
-.fab:hover {
-  background-color: #005fa3;
-}
