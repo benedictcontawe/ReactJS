@@ -1,0 +1,60 @@
+.card {
+    background-color: #fff;
+    border-radius: 12px;
+    padding: 16px;
+    margin: 16px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    max-width: 400px;
+    transition: box-shadow 0.3s ease-in-out;
+}
+
+.card-title {
+    font-size: 20px;
+    margin-bottom: 12px;
+    color: #333;
+    text-align: left;
+}
+
+.card-content {
+    font-size: 16px;
+    color: #555;
+    margin-bottom: 15px; /* Add some space below content before buttons */
+}
+
+.card-actions {
+    display: flex;
+    justify-content: flex-end; /* Align buttons to the right */
+    gap: 10px; /* Space between buttons */
+    margin-top: 15px; /* Space above buttons */
+}
+
+.card-actions button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.card-actions button:hover {
+    transform: translateY(-1px); /* Slight lift on hover */
+}
+
+.edit-button {
+    background-color: #007bff; /* Blue */
+    color: white;
+}
+
+.edit-button:hover {
+    background-color: #0056b3;
+}
+
+.delete-button {
+    background-color: #dc3545; /* Red */
+    color: white;
+}
+
+.delete-button:hover {
+    background-color: #bd2130;
+}
