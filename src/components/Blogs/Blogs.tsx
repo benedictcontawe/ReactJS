@@ -108,9 +108,9 @@ const Blogs = () => {
           <button className="fab" onClick={handleFabClick}>+</button>
           {showAddModal && (
             <AddDialog
-              isOpen={showAddModal} // Pass visibility state
-              onClose={handleCloseModal} // Pass close handler
-              onAdd={handleAddNewItem}   // Pass add handler
+              isOpen={showAddModal}
+              onClose={handleCloseModal}
+              onAdd={handleAddNewItem}
             />
           )}
           {showEditModal && editItemIndex !== null && (

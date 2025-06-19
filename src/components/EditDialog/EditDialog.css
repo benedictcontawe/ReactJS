@@ -4,11 +4,11 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black background */
+  background-color: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 2000; /* Higher than FAB's z-index */
+  z-index: 2000;
 }
 
 .modal-content {
@@ -17,10 +17,10 @@
   border-radius: 8px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
   width: 90%;
-  max-width: 500px; /* Limit width on larger screens */
-  transform: scale(0.95); /* Little animation on appearance */
+  max-width: 500px;
+  transform: scale(0.95);
   animation: scaleIn 0.2s forwards;
-  position: relative; /* Needed for potential future close button */
+  position: relative;
 }
 
 @keyframes scaleIn {
@@ -54,22 +54,22 @@
 
 .form-group input[type="text"],
 .form-group textarea {
-  width: calc(100% - 20px); /* Account for padding */
+  width: calc(100% - 20px);
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 4px;
   font-size: 16px;
-  box-sizing: border-box; /* Include padding and border in the element's total width and height */
+  box-sizing: border-box;
 }
 
 .form-group textarea {
-  resize: vertical; /* Allow vertical resizing */
+  resize: vertical;
 }
 
 .modal-actions {
   display: flex;
-  justify-content: flex-end; /* Align buttons to the right */
-  gap: 10px; /* Space between buttons */
+  justify-content: flex-end;
+  gap: 10px;
   margin-top: 20px;
 }
 

@@ -2,14 +2,14 @@ import React from 'react';
 import './Card.css';
 
 interface CardProps {
-  id: number; // Add an ID or index to identify which card is being acted upon
+  id: number;
   title: string;
   content: string;
   className?: string;
   titleClassName?: string;
   contentClassName?: string;
-  onEdit: (id: number) => void; // Callback for edit button click
-  onDelete: (id: number) => void; // Callback for delete button click
+  onEdit: (id: number) => void;
+  onDelete: (id: number) => void;
 }
 
 const Card: React.FC<CardProps> = ({
@@ -26,7 +26,7 @@ const Card: React.FC<CardProps> = ({
     <div className={`card ${className}`}>
       <h2 className={`card-title ${titleClassName}`}>{title}</h2>
       <p className={`card-content ${contentClassName}`}>{content}</p>
-      <div className="card-actions"> {/* Add a container for buttons */}
+      <div className="card-actions">
         <button className="edit-button" onClick={() => onEdit(id)}>
           Edit
         </button>
