@@ -11,7 +11,7 @@ interface BlogPost {
 }
 
 const Blogs = () => {
-    const [items, setItems] = useState<BlogPost[]>([]);
+  const [items, setItems] = useState<BlogPost[]>([]);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editItemIndex, setEditItemIndex] = useState<number | null>(null);
@@ -36,7 +36,6 @@ const Blogs = () => {
     //alert('FAB Clicked!');
     setShowAddModal(true);
   };
-
   const handleCloseModal = () => {
     setShowAddModal(false);
   };
@@ -46,7 +45,6 @@ const Blogs = () => {
       .from('posts')
       .insert([newItem])
       .select();
-
     if (error) {
       console.error('Insert error:', error);
     } else if (data && data[0]) {
@@ -78,7 +76,6 @@ const Blogs = () => {
         .update(updatedItem)
         .eq('id', id)
         .select();
-
       if (error) {
         console.error('Update error:', error);
       } else if (data && data[0]) {
@@ -92,37 +89,37 @@ const Blogs = () => {
       }
     }
   };
-    return (
-        <React.Fragment>
-          <h1>Blog List</h1>
-          <ul style={{ listStyle: 'none', padding: 0 }}>
-            { items.map((item,index) => (
-              <Card key={index} id={index} 
-                title={item.title} 
-                content={item.content} 
-                onEdit={handleEditItem}
-                onDelete={handleDeleteItem}
-              />
-            ))}
-          </ul>
-          <button className="fab" onClick={handleFabClick}>+</button>
-          {showAddModal && (
-            <AddDialog
-              isOpen={showAddModal}
-              onClose={handleCloseModal}
-              onAdd={handleAddNewItem}
-            />
-          )}
-          {showEditModal && editItemIndex !== null && (
-            <EditDialog
-              isOpen={showEditModal}
-              onClose={() => setShowEditModal(false)}
-              onSave={handleSaveEditedItem}
-              defaultValues={items[editItemIndex]}
-            />
-          )}
-        </React.Fragment>
-      )
+  return (
+    <React.Fragment>
+      <h1>Blog List</h1>
+      <ul style={{ listStyle: 'none', padding: 0 }}>
+        { items.map((item,index) => (
+          <Card key={index} id={index} 
+            title={item.title} 
+            content={item.content} 
+            onEdit={handleEditItem}
+            onDelete={handleDeleteItem}
+          />
+        ))}
+      </ul>
+      <button className="fab" onClick={handleFabClick}>+</button>
+      {showAddModal && (
+        <AddDialog
+          isOpen={showAddModal}
+          onClose={handleCloseModal}
+          onAdd={handleAddNewItem}
+        />
+      )}
+      {showEditModal && editItemIndex !== null && (
+        <EditDialog
+          isOpen={showEditModal}
+          onClose={() => setShowEditModal(false)}
+          onSave={handleSaveEditedItem}
+          defaultValues={items[editItemIndex]}
+        />
+      )}
+    </React.Fragment>
+  )
 }
 
 export default Blogs
