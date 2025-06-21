@@ -1,17 +1,16 @@
 import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { setPosts, addPost, updatePost, deletePost } from '../../redux/blogSlice';
 import './Blogs.css'
 import { supabase } from '../../supabaseClient';
 import Card from '../Card/Card';
 import AddDialog from '../AddDialog/AddDialog';
 import EditDialog from '../EditDialog/EditDialog';
-interface BlogPost {
-  id: number;
-  title: string;
-  content: string;
-}
+import type { RootState } from '../../redux/store';
 
 const Blogs = () => {
-  const [items, setItems] = useState<BlogPost[]>([]);
+  const posts = useSelector((state: RootState) => state.blog.posts);
+  const dispatch = useDispatch();
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editItemIndex, setEditItemIndex] = useState<number | null>(null);
@@ -27,11 +26,11 @@ const Blogs = () => {
         console.error('Fetch error:', error);
       } else {
         console.log('Fetched', data);
-        setItems(data || []);
+        dispatch(setPosts(data || []));
       }
     };
     fetchPosts();
-  }, [])
+  }, [dispatch])
   const handleFabClick = () => {
     //alert('FAB Clicked!');
     setShowAddModal(true);
@@ -49,7 +48,7 @@ const Blogs = () => {
       console.error('Insert error:', error);
     } else if (data && data[0]) {
       console.log('Insert Done');
-      setItems(prevItems => [data[0], ...prevItems]);
+      dispatch(addPost(data[0]));
       setShowAddModal(false);
     }
   };
@@ -58,19 +57,19 @@ const Blogs = () => {
     setShowEditModal(true);
   };
   const handleDeleteItem = async (indexToDelete: number) => {
-    const id = items[indexToDelete].id;
-    if (window.confirm(`Are you sure you want to delete "${items[indexToDelete].title}"?`)) {
+    const id = posts[indexToDelete].id;
+    if (window.confirm(`Are you sure you want to delete "${posts[indexToDelete].title}"?`)) {
       const { error } = await supabase.from('posts').delete().eq('id', id);
       if (error) {
         console.error('Delete error:', error);
       } else {
-        setItems(prevItems => prevItems.filter((_, i) => i !== indexToDelete));
+        dispatch(deletePost(id));
       }
     }
   };
   const handleSaveEditedItem = async (updatedItem: { title: string; content: string }) => {
     if (editItemIndex !== null) {
-      const id = items[editItemIndex].id;
+      const id = posts[editItemIndex].id;
       const { data, error } = await supabase
         .from('posts')
         .update(updatedItem)
@@ -79,11 +78,7 @@ const Blogs = () => {
       if (error) {
         console.error('Update error:', error);
       } else if (data && data[0]) {
-        setItems(prev => {
-          const copy = [...prev];
-          copy[editItemIndex] = data[0];
-          return copy;
-        });
+        dispatch(updatePost(data[0]));
         setEditItemIndex(null);
         setShowEditModal(false);
       }
@@ -93,7 +88,7 @@ const Blogs = () => {
     <React.Fragment>
       <h1>Blog List</h1>
       <ul style={{ listStyle: 'none', padding: 0 }}>
-        { items.map((item,index) => (
+        { posts.map((item, index) => (
           <Card key={index} id={index} 
             title={item.title} 
             content={item.content} 
@@ -115,7 +110,7 @@ const Blogs = () => {
           isOpen={showEditModal}
           onClose={() => setShowEditModal(false)}
           onSave={handleSaveEditedItem}
-          defaultValues={items[editItemIndex]}
+          defaultValues={posts[editItemIndex]}
         />
       )}
     </React.Fragment>
