@@ -4,49 +4,71 @@ import './EditDialog.css';
 interface EditDialogProps {
     isOpen: boolean;
     onClose: () => void;
-    onSave: (item: { title: string; content: string }) => void;
-    defaultValues: { title: string; content: string };
+    onSave: (item: { name: string; image_name: string; image_url: string }) => void;
+    defaultValues: { name: string; image_name: string; image_url: string };
   }
 
   const EditDialog: React.FC<EditDialogProps> = ({ isOpen, onClose, onSave, defaultValues }) => {
-    const [title, setTitle] = useState(defaultValues.title);
-    const [content, setContent] = useState(defaultValues.content);
+    const [name, setName] = useState(defaultValues.name);
+    const [image_name, setImageName] = useState(defaultValues.image_name);
+    const [image_url, setImageUrl] = useState(defaultValues.image_url);
   
     useEffect(() => {
-      setTitle(defaultValues.title);
-      setContent(defaultValues.content);
+      setName(defaultValues.name);
+      setImageName(defaultValues.image_name);
+      setImageUrl(defaultValues.image_url);
     }, [defaultValues]);
   
     if (!isOpen) return null;
   
     const handleSubmit = (e: React.FormEvent) => {
       e.preventDefault();
-      onSave({ title, content });
+      onSave({ name, image_name, image_url });
     };
-  
+
     return (
       <div className="modal-overlay" onClick={onClose}>
         <div className="modal-content" onClick={e => e.stopPropagation()}> {　}
-          <h2>Edit Blog Post</h2>
+          <h2>Edit Item</h2>
           <form onSubmit={handleSubmit}>
             <div className="form-group">
-            <label htmlFor="title">Title:</label>
+            <label htmlFor="name">Name:</label>
             <input
               type="text"
-              placeholder="Title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
               required
             />
             </div>
             <div className="form-group">
-              <label htmlFor="content">Content:</label>
-              <textarea
-                placeholder="Content"
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
+              <label htmlFor="image_name">Image Name:</label>
+              <input
+                type="text"
+                placeholder="Image Name"
+                value={image_name}
+                onChange={(e) => setImageName(e.target.value)}
                 required
               />
+            </div>
+            <div className="form-group">
+              <label htmlFor="image_url">Image URL:</label>
+              <input
+                type="url"
+                placeholder="Image URL"
+                value={image_url}
+                onChange={(e) => setImageUrl(e.target.value)}
+                required
+              />
+              {/* TODO: Replace URL input with file upload functionality
+                  1. Add file input for image selection from device
+                  2. Upload selected image to Firebase Storage
+                  3. Get download URL from Firebase Storage
+                  4. Auto-populate image_url field with the Firebase Storage URL
+                  5. Auto-populate image_name field with the original filename
+                  6. Handle image replacement (delete old image from Storage if updating)
+                  Reference: Similar to Android Studio/Flutter implementation
+              */}
             </div>
             <div className="modal-actions">
               <button type="submit">Update</button>

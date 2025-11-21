@@ -1,25 +1,26 @@
 import React, { useState } from 'react'
 import './Login.css'
 import { Link, useNavigate } from 'react-router-dom';
-import { supabase } from '../../supabaseClient';
+import { login } from '../../util/auth';
 
 const Login = () => {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
+  const [error, setError] = useState<string>('');
   const navigate = useNavigate();
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    if (error) {
-      console.error('Login error:', error);
-      alert(`Login failed: ${error.message}`);
-    } else {
-      console.log('Login successful', data);
+    setError('');
+    try {
+      await login(email, password);
+      console.log('Login successful');
       alert('Login successful!');
       navigate('/blogs');
+    } catch (err: any) {
+      console.error('Login error:', err);
+      const errorMessage = err.message || 'Login failed. Please try again.';
+      setError(errorMessage);
+      alert(`Login failed: ${errorMessage}`);
     }
   };
   return (
@@ -50,6 +51,7 @@ const Login = () => {
               className="auth-input"
             />
           </div>
+          {error && <div className="error-message" style={{ color: 'red', marginBottom: '10px' }}>{error}</div>}
           <button type="submit" className="auth-button">Login</button>
         </form>
         <p className="auth-switch-text">

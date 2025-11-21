@@ -1,25 +1,26 @@
 import React, { useState } from 'react'
 import './Register.css'
 import { Link, useNavigate } from 'react-router-dom';
-import { supabase } from '../../supabaseClient';
+import { createUser } from '../../util/auth';
 
 const Register = () => {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
+  const [error, setError] = useState<string>('');
   const navigate = useNavigate();
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-    });
-    if (error) {
-      console.error('Registration error:', error);
-      alert(`Registration failed: ${error.message}`);
-    } else {
-      console.log('Registration successful', data);
-      alert('Registration successful! Please check your email to confirm.');
+    setError('');
+    try {
+      await createUser(email, password);
+      console.log('Registration successful');
+      alert('Registration successful! You can now login.');
       navigate('/login');
+    } catch (err: any) {
+      console.error('Registration error:', err);
+      const errorMessage = err.message || 'Registration failed. Please try again.';
+      setError(errorMessage);
+      alert(`Registration failed: ${errorMessage}`);
     }
   };
   return (
@@ -50,6 +51,7 @@ const Register = () => {
               className="auth-input"
             />
           </div>
+          {error && <div className="error-message" style={{ color: 'red', marginBottom: '10px' }}>{error}</div>}
           <button type="submit" className="auth-button">Register</button>
         </form>
         <p className="auth-switch-text">
