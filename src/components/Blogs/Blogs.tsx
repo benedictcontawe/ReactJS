@@ -109,14 +109,12 @@ const Blogs = () => {
       <button className="fab" onClick={handleFabClick}>+</button>
       {showAddModal && (
         <AddDialog
-          isOpen={showAddModal}
           onClose={handleCloseModal}
           onAdd={handleAddNewItem}
         />
       )}
       {showEditModal && editItemIndex !== null && (
         <EditDialog
-          isOpen={showEditModal}
           onClose={() => setShowEditModal(false)}
           onSave={handleSaveEditedItem}
           defaultValues={posts[editItemIndex]}
