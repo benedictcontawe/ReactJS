@@ -1,5 +1,5 @@
 import { Navigate } from 'react-router-dom';
-import { onAuthStateChange } from '../util/auth';
+import { onAuthStateChange } from '../utils/auth';
 import { useEffect, useState } from 'react';
 import type { JSX } from 'react';
 import type { User } from 'firebase/auth';
