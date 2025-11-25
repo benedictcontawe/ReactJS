@@ -55,7 +55,7 @@ const AddDialog = ({ onClose, onAdd }: AddDialogProps) => {
 
   /**
    * Handles the form submission.
-   * It validates the form, uploads the selected file to Firebase Storage,
+   * It validates the form, uploads the selected file to the backend API,
    * calls the onAdd callback with the new item's data, and then resets the form.
    * @param e The form submission event.
    */

@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { setPosts, addPost, updatePost, deletePost } from '../../redux/blogSlice';
-import './Blogs.css'
-import { db } from '../../firebaseConfig';
-import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from 'firebase/firestore';
+import './Blogs.css';
+import { postsAPI } from '../../network/api-client';
 import Card from '../Card/Card';
 import AddDialog from '../AddDialog/AddDialog';
 import EditDialog from '../EditDialog/EditDialog';
@@ -20,23 +19,17 @@ const Blogs = () => {
     const fetchPosts = async () => {
       console.log('Fetching...');
       try {
-        const postsRef = collection(db, 'object');
-        const querySnapshot = await getDocs(postsRef);
-        const posts: BlogPost[] = [];
-        querySnapshot.forEach((doc) => {
-          posts.push({
-            id: doc.id,
-            ...doc.data()
-          } as BlogPost);
-        });
-        console.log('Fetched', posts);
+        const response = await postsAPI.getAll();
+        const posts: BlogPost[] = response.data.data || response.data || [];
+        console.log('Fetched posts:', posts);
         dispatch(setPosts(posts));
       } catch (error) {
         console.error('Fetch error:', error);
+        alert('Failed to fetch posts. Please try again.');
       }
     };
     fetchPosts();
-  }, [dispatch])
+  }, [dispatch]);
   
   const handleFabClick = () => setShowAddModal(true);
   const handleCloseModal = () => setShowAddModal(false);
@@ -44,17 +37,17 @@ const Blogs = () => {
   const handleAddNewItem = async (newItem: { name: string; image_name: string; image_url: string }) => {
     console.log('Appending...');
     try {
-      const postsRef = collection(db, 'object');
-      const docRef = await addDoc(postsRef, newItem);
+      const response = await postsAPI.create(newItem);
       const newPost: BlogPost = {
-        id: docRef.id,
+        id: response.data.data?.id || response.data.id || Date.now().toString(),
         ...newItem
       };
-      console.log('Insert Done');
+      console.log('Insert Done:', newPost);
       dispatch(addPost(newPost));
       setShowAddModal(false);
     } catch (error) {
       console.error('Insert error:', error);
+      alert('Failed to create post. Please try again.');
     }
   };
   const handleEditItem = (indexToEdit: number) => {
@@ -65,11 +58,11 @@ const Blogs = () => {
     const id = posts[indexToDelete].id;
     if (window.confirm(`Are you sure you want to delete "${posts[indexToDelete].name}"?`)) {
       try {
-        const postRef = doc(db, 'object', id);
-        await deleteDoc(postRef);
+        await postsAPI.delete(id);
         dispatch(deletePost(id));
       } catch (error) {
         console.error('Delete error:', error);
+        alert('Failed to delete post. Please try again.');
       }
     }
   };
@@ -78,8 +71,7 @@ const Blogs = () => {
     if (editItemIndex !== null) {
       const id = posts[editItemIndex].id;
       try {
-        const postRef = doc(db, 'object', id);
-        await updateDoc(postRef, updatedItem);
+        await postsAPI.update(id, updatedItem);
         const updatedPost: BlogPost = {
           id,
           ...updatedItem
@@ -89,6 +81,7 @@ const Blogs = () => {
         setShowEditModal(false);
       } catch (error) {
         console.error('Update error:', error);
+        alert('Failed to update post. Please try again.');
       }
     }
   };

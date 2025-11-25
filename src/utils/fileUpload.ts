@@ -1,5 +1,4 @@
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { storage } from '../firebaseConfig';
+import { uploadAPI } from '../network/api-client';
 
 /**
  * Interface representing processed file information.
@@ -36,25 +35,18 @@ export const isImageExtension = (fileExtension: string): boolean => {
 };
 
 /**
- * Uploads a file to Firebase Storage and returns its public download URL.
- * @param file - The File object to upload.
- * @param path - The destination path in Firebase Storage (e.g., 'avatars', 'posts'). Defaults to 'images'.
- * @returns A promise that resolves to the public download URL of the uploaded file.
- * @throws Will throw an error if the upload fails.
- */
+* Uploads a file to the backend API and returns its download URL.
+* @param file - The File object to upload.
+* @param path - The destination path (e.g., 'avatars', 'posts'). Defaults to 'images'.
+* @returns A promise that resolves to the download URL of the uploaded file.
+* @throws Will throw an error if the upload fails.
+*/
 export const uploadFileToStorage = async (
-  file: File,
-  path: string = 'images'
+ file: File,
+ path: string = 'images'
 ): Promise<string> => {
-  try {
-    const storageRef = ref(storage, `${path}/${Date.now()}_${file.name}`);
-    await uploadBytes(storageRef, file);
-    const downloadURL = await getDownloadURL(storageRef);
-    return downloadURL;
-  } catch (error) {
-    console.error('Error uploading file:', error);
-    throw error;
-  }
+ const response = await uploadAPI.upload(file, path);
+ return response.data.image_url;
 };
 
 /**
