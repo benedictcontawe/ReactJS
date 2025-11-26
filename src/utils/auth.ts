@@ -1,3 +1,5 @@
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from 'firebase/auth';
+import { auth } from '../config/firebaseAuth';
 import { authAPI } from '../network/api-client';
 
 /**
@@ -17,14 +19,6 @@ export interface User {
 const TOKEN_KEY = 'auth_token';
 
 /**
- * Retrieves the authentication token from localStorage.
- * @returns The authentication token string, or null if no token exists.
- */
-const getToken = (): string | null => {
-  return localStorage.getItem(TOKEN_KEY);
-};
-
-/**
  * Stores the authentication token in localStorage.
  * This token will be automatically included in API requests via axios interceptors.
  * @param token - The authentication token to store.
@@ -42,9 +36,11 @@ const removeToken = (): void => {
 };
 
 /**
- * Registers a new user account with the backend.
- * Sends a POST request to /api/auth/register with email and password.
- * Automatically stores the returned authentication token.
+ * Registers a new user account.
+ * Uses Firebase Auth SDK to create the user and verify the password,
+ * then sends the ID token to the backend for user creation.
+ * 
+ * This follows Firebase's best practice: verify password on client, send ID token to backend.
  * 
  * @param email - The user's email address.
  * @param password - The user's chosen password.
@@ -62,15 +58,22 @@ const removeToken = (): void => {
  * ```
  */
 export const createUser = async (email: string, password: string): Promise<User> => {
-  const response = await authAPI.register(email, password);
+  // Step 1: Create user in Firebase Auth (this verifies password strength, etc.)
+  const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+  const idToken = await userCredential.user.getIdToken();
+  
+  // Step 2: Send ID token to backend to register user
+  const response = await authAPI.registerWithToken(idToken);
   setToken(response.data.token);
   return response.data.user;
 };
 
 /**
  * Authenticates an existing user and logs them in.
- * Sends a POST request to /api/auth/login with email and password.
- * Automatically stores the returned authentication token.
+ * Uses Firebase Auth SDK to verify the password, then sends the ID token to the backend.
+ * 
+ * This follows Firebase's best practice: verify password on client, send ID token to backend.
+ * Wrong passwords are rejected by Firebase Auth SDK before reaching the backend.
  * 
  * @param email - The user's email address.
  * @param password - The user's password.
@@ -88,15 +91,20 @@ export const createUser = async (email: string, password: string): Promise<User>
  * ```
  */
 export const login = async (email: string, password: string): Promise<User> => {
-  const response = await authAPI.login(email, password);
+  // Step 1: Verify password with Firebase Auth SDK (this will throw if password is wrong)
+  const userCredential = await signInWithEmailAndPassword(auth, email, password);
+  const idToken = await userCredential.user.getIdToken();
+  
+  // Step 2: Send ID token to backend (backend verifies the token)
+  const response = await authAPI.loginWithToken(idToken);
   setToken(response.data.token);
   return response.data.user;
 };
 
 /**
  * Logs out the current user.
- * Sends a POST request to /api/auth/logout to invalidate the session on the backend.
- * Removes the authentication token from localStorage, regardless of whether the API call succeeds.
+ * Follows Firebase best practice: calls signOut() from Firebase Auth SDK to clear the session,
+ * then optionally notifies the backend, and finally removes the token from localStorage.
  * 
  * @returns A Promise that resolves when logout is complete.
  * 
@@ -106,19 +114,25 @@ export const login = async (email: string, password: string): Promise<User> => {
  * // User is now logged out and token is removed
  * ```
  */
-export const logout = async (): Promise<void> => {
+export const logout = async (): Promise<void> => {  
   try {
-    await authAPI.logout();
-  } finally {
-    // Always remove token, even if API call fails
-    removeToken();
+    await signOut(auth);// Step 1: Sign out from Firebase Auth SDK (clears session, triggers onAuthStateChanged)
+  } catch (error) {
+    console.error('[AUTH] Firebase signOut failed:', error);// Continue with logout even if signOut fails
   }
+  
+  try {// Step 2: Optional: Notify backend (for logging/audit purposes)
+    await authAPI.logout();
+  } catch (error) {// Backend call failure is not critical, continue with logout
+    console.warn('[AUTH] Backend logout notification failed:', error);
+  }
+  removeToken();// Step 3: Always remove token from localStorage
 };
 
 /**
- * Retrieves the currently authenticated user from the backend.
- * Sends a GET request to /api/auth/me with the stored authentication token.
- * If no token exists or the request fails, returns null and removes the invalid token.
+ * Retrieves the currently authenticated user.
+ * Follows Firebase best practice: uses Firebase Auth SDK's currentUser instead of calling backend.
+ * This is more efficient, works offline, and automatically stays in sync with Firebase Auth state.
  * 
  * @returns A Promise that resolves to the current User object, or null if not authenticated.
  * 
@@ -134,28 +148,34 @@ export const logout = async (): Promise<void> => {
  */
 export const getCurrentUser = async (): Promise<User | null> => {
   try {
-    const token = getToken();
-    if (!token) return null;
-
-    const response = await authAPI.getCurrentUser();
-    return response.data.user;
-  } catch {
-    // If request fails (e.g., token expired), remove invalid token
-    removeToken();
+    const firebaseUser = auth.currentUser;// Use Firebase Auth SDK's currentUser (best practice)    
+    if (firebaseUser) {      
+      const idToken = await firebaseUser.getIdToken();// Get fresh ID token and sync with localStorage
+      setToken(idToken);      
+      return {
+        id: firebaseUser.uid,
+        email: firebaseUser.email || '',
+        name: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'User',
+      };
+    }    
+    
+    removeToken();// No user authenticated, ensure token is removed
+    return null;
+  } catch (error) {
+    console.error('[AUTH] Error getting current user:', error);
+    
+    removeToken();// If Firebase Auth fails, remove invalid token
     return null;
   }
 };
 
 /**
  * Sets up a callback to be notified when the authentication state changes.
- * Immediately checks the current authentication state and calls the callback.
- * Returns a cleanup function (currently a no-op, but included for API consistency).
- * 
- * Note: This is a simplified implementation. For real-time auth state changes,
- * you would need to implement polling or WebSocket connections.
+ * Follows Firebase best practice: uses Firebase Auth SDK's onAuthStateChanged observer.
+ * This provides real-time updates when the user logs in, logs out, or token refreshes.
  * 
  * @param callback - A function that will be called with the current user (or null if not authenticated).
- * @returns A cleanup function that can be called to unsubscribe (currently a no-op).
+ * @returns A cleanup function that can be called to unsubscribe from auth state changes.
  * 
  * @example
  * ```typescript
@@ -167,13 +187,32 @@ export const getCurrentUser = async (): Promise<User | null> => {
  *   }
  * });
  * 
- * // Later, cleanup (optional)
+ * // Later, cleanup (important to prevent memory leaks)
  * unsubscribe();
  * ```
  */
 export const onAuthStateChange = (callback: (user: User | null) => void): (() => void) => {
-  // Immediately check current auth state
-  getCurrentUser().then(callback);
-  // Return cleanup function (no-op for now, but maintains API consistency)
-  return () => {};
+  // Use Firebase Auth SDK's onAuthStateChanged (best practice)
+  const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+    if (firebaseUser) {
+      // Get fresh ID token and sync with localStorage
+      const idToken = await firebaseUser.getIdToken();
+      setToken(idToken);
+      
+      // Convert Firebase user to our User interface
+      const user: User = {
+        id: firebaseUser.uid,
+        email: firebaseUser.email || '',
+        name: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'User',
+      };
+      callback(user);
+    } else {
+      // User signed out, remove token
+      removeToken();
+      callback(null);
+    }
+  });
+  
+  // Return cleanup function to unsubscribe
+  return unsubscribe;
 };

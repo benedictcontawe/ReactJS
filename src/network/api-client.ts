@@ -52,8 +52,12 @@ export const uploadAPI = {
 export const authAPI = {
   register: (email: string, password: string) => 
     api.post('/auth/register', { email, password }),
+  registerWithToken: (idToken: string) => 
+    api.post('/auth/register', { idToken }),
   login: (email: string, password: string) => 
     api.post('/auth/login', { email, password }),
+  loginWithToken: (idToken: string) => 
+    api.post('/auth/login', { idToken }),
   logout: () => api.post('/auth/logout'),
   getCurrentUser: () => api.get('/auth/me'),
 };

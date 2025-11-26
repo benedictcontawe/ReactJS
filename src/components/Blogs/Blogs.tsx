@@ -3,9 +3,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setPosts, addPost, updatePost, deletePost } from '../../redux/blogSlice';
 import './Blogs.css';
 import { postsAPI } from '../../network/api-client';
-import Card from '../Card/Card';
 import AddDialog from '../AddDialog/AddDialog';
 import EditDialog from '../EditDialog/EditDialog';
+import EmptyState from './EmptyState';
+import PostsList from './PostsList';
+import LoadingState from './LoadingState';
 import type { RootState } from '../../redux/store';
 import type { BlogPost } from '../../redux/blogSlice';
 
@@ -15,17 +17,26 @@ const Blogs = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editItemIndex, setEditItemIndex] = useState<number | null>(null);
+  const [loading, setLoading] = useState(true);
+  
   useEffect(() => {
     const fetchPosts = async () => {
-      console.log('Fetching...');
+      console.log('[Blogs] Fetching posts...');
+      setLoading(true);
       try {
         const response = await postsAPI.getAll();
+        console.log('[Blogs] API response:', response);
         const posts: BlogPost[] = response.data.data || response.data || [];
-        console.log('Fetched posts:', posts);
+        console.log('[Blogs] Fetched posts:', posts);
         dispatch(setPosts(posts));
-      } catch (error) {
-        console.error('Fetch error:', error);
-        alert('Failed to fetch posts. Please try again.');
+      } catch (error: any) {
+        console.error('[Blogs] Fetch error:', error);
+        console.error('[Blogs] Error response:', error.response);
+        console.error('[Blogs] Error message:', error.message);
+        const errorMessage = error.response?.data?.error || error.message || 'Failed to fetch posts';
+        alert(`Failed to fetch posts: ${errorMessage}`);
+      } finally {
+        setLoading(false);
       }
     };
     fetchPosts();
@@ -35,25 +46,45 @@ const Blogs = () => {
   const handleCloseModal = () => setShowAddModal(false);
 
   const handleAddNewItem = async (newItem: { name: string; image_name: string; image_url: string }) => {
-    console.log('Appending...');
+    console.log('[Blogs] Creating new post...', newItem);
     try {
       const response = await postsAPI.create(newItem);
-      const newPost: BlogPost = {
-        id: response.data.data?.id || response.data.id || Date.now().toString(),
-        ...newItem
-      };
-      console.log('Insert Done:', newPost);
-      dispatch(addPost(newPost));
-      setShowAddModal(false);
-    } catch (error) {
-      console.error('Insert error:', error);
-      alert('Failed to create post. Please try again.');
+      console.log('[Blogs] Create post response:', response);      
+      // Extract the created post from response
+      const createdPost = response.data.data || response.data;
+      console.log('[Blogs] Created post:', createdPost);      
+      if (createdPost && createdPost.id) {
+        const newPost: BlogPost = {
+          id: createdPost.id,
+          name: createdPost.name || newItem.name,
+          image_name: createdPost.image_name || newItem.image_name,
+          image_url: createdPost.image_url || newItem.image_url,
+        };        
+        console.log('[Blogs] Adding post to Redux:', newPost);
+        dispatch(addPost(newPost));
+        setShowAddModal(false);        
+        // Refetch all posts to ensure we have the latest data from Firestore
+        console.log('[Blogs] Refetching all posts after creation...');
+        const fetchResponse = await postsAPI.getAll();
+        const allPosts: BlogPost[] = fetchResponse.data.data || fetchResponse.data || [];
+        console.log('[Blogs] Refetched posts:', allPosts);
+        dispatch(setPosts(allPosts));
+      } else {
+        throw new Error('Invalid response from server: missing post data');
+      }
+    } catch (error: any) {
+      console.error('[Blogs] Create post error:', error);
+      console.error('[Blogs] Error response:', error.response);
+      const errorMessage = error.response?.data?.error || error.message || 'Failed to create post';
+      alert(`Failed to create post: ${errorMessage}`);
     }
   };
+  
   const handleEditItem = (indexToEdit: number) => {
     setEditItemIndex(indexToEdit);
     setShowEditModal(true);
   };
+
   const handleDeleteItem = async (indexToDelete: number) => {
     const id = posts[indexToDelete].id;
     if (window.confirm(`Are you sure you want to delete "${posts[indexToDelete].name}"?`)) {
@@ -88,17 +119,17 @@ const Blogs = () => {
   return (
     <React.Fragment>
       <h1>Blog List</h1>
-      <ul style={{ listStyle: 'none', padding: 0 }}>
-        { posts.map((item, index) => (
-          <Card key={index} id={index} 
-            name={item.name} 
-            image_name={item.image_name}
-            image_url={item.image_url}
-            onEdit={handleEditItem}
-            onDelete={handleDeleteItem}
-          />
-        ))}
-      </ul>
+      {loading ? (
+        <LoadingState />
+      ) : posts.length === 0 ? (
+        <EmptyState />
+      ) : (
+        <PostsList 
+          posts={posts}
+          onEdit={handleEditItem}
+          onDelete={handleDeleteItem}
+        />
+      )}
       <button className="fab" onClick={handleFabClick}>+</button>
       {showAddModal && (
         <AddDialog
