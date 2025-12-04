@@ -37,15 +37,13 @@ export const isImageExtension = (fileExtension: string): boolean => {
 /**
 * Uploads a file to the backend API and returns its download URL.
 * @param file - The File object to upload.
-* @param path - The destination path (e.g., 'avatars', 'posts'). Defaults to 'images'.
 * @returns A promise that resolves to the download URL of the uploaded file.
 * @throws Will throw an error if the upload fails.
 */
 export const uploadFileToStorage = async (
- file: File,
- path: string = 'images'
+ file: File
 ): Promise<string> => {
- const response = await uploadAPI.upload(file, path);
+ const response = await uploadAPI.upload(file);
  return response.data.image_url;
 };
 

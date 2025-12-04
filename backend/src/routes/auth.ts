@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { register, login, logout, getCurrentUser } from '../controllers/authController';
+import { authMiddleware } from '../middleware/authMiddleware';
 
 const router = Router();
 
@@ -124,7 +125,7 @@ router.post('/login', login);
  *       500:
  *         description: Logout failed
  */
-router.post('/logout', logout);
+router.post('/logout', authMiddleware, logout);
 
 /**
  * @swagger
@@ -156,6 +157,6 @@ router.post('/logout', logout);
  *       500:
  *         description: Failed to get user
  */
-router.get('/me', getCurrentUser);
+router.get('/me', authMiddleware, getCurrentUser);
 
 export default router;

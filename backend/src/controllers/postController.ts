@@ -1,15 +1,10 @@
 import { Request, Response } from 'express';
-import { db } from '../config/firebaseAdmin';
-import admin from 'firebase-admin';
-
-// Collection name: 'object'
-// Firestore automatically creates collections when first document is added
-const POSTS_COLLECTION = 'object';
+import { Post } from '../models/Post';
 
 /**
- * Post interface matching Firestore document structure
+ * Post interface matching MongoDB document structure
  */
-export interface Post {
+export interface PostResponse {
   id: string;
   name: string;
   image_name: string;
@@ -17,7 +12,8 @@ export interface Post {
 }
 
 /**
- * Retrieves all blog posts from Firestore.
+ * Retrieves all blog posts from MongoDB.
+ * Posts are sorted by creation date (newest first).
  * 
  * @param req - Express request object
  * @param res - Express response object
@@ -30,46 +26,30 @@ export interface Post {
  */
 export const getAllPosts = async (req: Request, res: Response) => {
   try {
-    console.log(`[POSTS] Querying collection "${POSTS_COLLECTION}"...`);
-    console.log(`[POSTS] Using Firestore instance:`, db ? 'initialized' : 'NOT initialized');    
-    // Direct query - matches Flutter app: dbFirestore.collection("object").get()
-    const postsSnapshot = await db.collection(POSTS_COLLECTION).get();    
-    console.log(`[POSTS] Query returned ${postsSnapshot.size} documents`);
-    console.log(`[POSTS] Query empty: ${postsSnapshot.empty}`);    
-    const posts: Post[] = [];    
-    if (postsSnapshot.empty) {
-      console.log(`[POSTS] Collection "${POSTS_COLLECTION}" is empty (no documents found)`);
+    console.log('[POSTS] Querying MongoDB collection "posts"...');
+    
+    // Find all posts, sorted by createdAt (newest first)
+    const posts = await Post.find().sort({ createdAt: -1 });
+    
+    console.log(`[POSTS] Query returned ${posts.length} documents`);
+    
+    // Map to response format
+    const postsResponse: PostResponse[] = posts.map((post) => ({
+      id: post._id.toString(),
+      name: post.name,
+      image_name: post.image_name,
+      image_url: post.image_url,
+    }));
+
+    if (posts.length === 0) {
+      console.log('[POSTS] Collection "posts" is empty');
     } else {
-      postsSnapshot.forEach((doc) => {
-        const data = doc.data();
-        console.log(`[POSTS] Processing document ${doc.id}:`, {
-          exists: doc.exists,
-          hasData: !!data,
-          fields: Object.keys(data || {}),
-          name: data?.name,
-          image_name: data?.image_name,
-          image_url: data?.image_url,
-          rawData: data
-        });        
-        // Map fields exactly as Flutter app does:
-        // Flutter: name from Constants.NAME, icon from Constants.IMAGE_URL, file from Constants.IMAGE_NAME
-        posts.push({
-          id: doc.id,
-          name: data?.name || '',
-          image_name: data?.image_name || '',
-          image_url: data?.image_url || '',
-        } as Post);
-      });
+      console.log(`[POSTS] Successfully retrieved ${posts.length} documents. Document IDs:`, postsResponse.map(p => p.id));
     }
-    console.log(`[POSTS] Retrieved ${posts.length} documents from Firestore collection "${POSTS_COLLECTION}"`);
-    if (posts.length > 0) {
-      console.log(`[POSTS] Successfully retrieved ${posts.length} documents. Document IDs:`, posts.map(p => p.id));
-      console.log(`[POSTS] Sample post:`, posts[0]);
-    }    
-    res.status(200).json({ data: posts });
+    
+    res.status(200).json({ data: postsResponse });
   } catch (error: any) {
     console.error('[POSTS] getAllPosts error:', error);
-    console.error('[POSTS] Error code:', error.code);
     console.error('[POSTS] Error message:', error.message);
     console.error('[POSTS] Error stack:', error.stack);
     res.status(500).json({ 
@@ -80,7 +60,7 @@ export const getAllPosts = async (req: Request, res: Response) => {
 };
 
 /**
- * Retrieves a single blog post by ID from Firestore.
+ * Retrieves a single blog post by ID from MongoDB.
  * 
  * @param req - Express request object
  * @param req.params.id - The ID of the post to retrieve
@@ -96,25 +76,40 @@ export const getAllPosts = async (req: Request, res: Response) => {
 export const getPostById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const postDoc = await db.collection(POSTS_COLLECTION).doc(id).get();
-    if (!postDoc.exists) {
+    
+    const post = await Post.findById(id);
+    
+    if (!post) {
       console.warn(`[POSTS] Post not found: ${id}`);
       return res.status(404).json({ error: 'Post not found' });
     }
-    const post: Post = {
-      id: postDoc.id,
-      ...postDoc.data()
-    } as Post;
+
+    const postResponse: PostResponse = {
+      id: post._id.toString(),
+      name: post.name,
+      image_name: post.image_name,
+      image_url: post.image_url,
+    };
+
     console.log(`[POSTS] Retrieved post: ${id}`);
-    res.status(200).json({ data: post });
-  } catch (error) {
+    res.status(200).json({ data: postResponse });
+  } catch (error: any) {
     console.error('[POSTS] getPostById error:', error);
-    res.status(500).json({ error: 'Failed to retrieve post' });
+    
+    // Handle invalid ObjectId format
+    if (error.name === 'CastError') {
+      return res.status(400).json({ error: 'Invalid post ID format' });
+    }
+    
+    res.status(500).json({ 
+      error: 'Failed to retrieve post',
+      details: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
   }
 };
 
 /**
- * Creates a new blog post in Firestore.
+ * Creates a new blog post in MongoDB.
  * 
  * @param req - Express request object containing post data in body
  * @param req.body.name - The name/title of the post
@@ -128,45 +123,55 @@ export const getPostById = async (req: Request, res: Response) => {
  * @example
  * POST /api/posts
  * Body: { "name": "New Post", "image_name": "image.jpg", "image_url": "https://..." }
- * Response: { "data": { "id": "firestore-id", "name": "New Post", ... } }
+ * Response: { "data": { "id": "mongodb-id", "name": "New Post", ... } }
  */
 export const createPost = async (req: Request, res: Response) => {
   try {
     const { name, image_name, image_url } = req.body;
+    
     if (!name || !image_name || !image_url) {
       console.warn('[POSTS] Missing required fields for post creation');
       return res.status(400).json({ error: 'Missing required fields: name, image_name, image_url' });
     }
-    const postData = {
+
+    // Create new post
+    const post = new Post({
       name,
       image_name,
       image_url,
-      createdAt: admin.firestore.FieldValue.serverTimestamp(),
-      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+
+    await post.save();
+
+    const postResponse: PostResponse = {
+      id: post._id.toString(),
+      name: post.name,
+      image_name: post.image_name,
+      image_url: post.image_url,
     };
-    // Firestore automatically creates the collection if it doesn't exist
-    const docRef = await db.collection(POSTS_COLLECTION).add(postData);
-    // Fetch the created document to get the actual data (including timestamps)
-    const createdDoc = await docRef.get();
-    const createdData = createdDoc.data();
-    const newPost: Post = {
-      id: docRef.id,
-      name: createdData?.name || name,
-      image_name: createdData?.image_name || image_name,
-      image_url: createdData?.image_url || image_url,
-    } as Post;
-    console.log(`[POSTS] Created new document in collection "${POSTS_COLLECTION}": ${docRef.id} - ${name}`);
-    console.log(`[POSTS] Collection "${POSTS_COLLECTION}" now has documents (created automatically if it was empty)`);
-    console.log(`[POSTS] Created post data:`, newPost);
-    res.status(201).json({ data: newPost });
-  } catch (error) {
+
+    console.log(`[POSTS] Created new post in collection "posts": ${post._id} - ${name}`);
+    console.log(`[POSTS] Created post data:`, postResponse);
+    
+    res.status(201).json({ data: postResponse });
+  } catch (error: any) {
     console.error('[POSTS] createPost error:', error);
-    res.status(500).json({ error: 'Failed to create post' });
+    
+    // Handle validation errors
+    if (error.name === 'ValidationError') {
+      const messages = Object.values(error.errors).map((err: any) => err.message);
+      return res.status(400).json({ error: messages.join(', ') });
+    }
+    
+    res.status(500).json({ 
+      error: 'Failed to create post',
+      details: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
   }
 };
 
 /**
- * Updates an existing blog post in Firestore.
+ * Updates an existing blog post in MongoDB.
  * 
  * @param req - Express request object
  * @param req.params.id - The ID of the post to update
@@ -188,37 +193,60 @@ export const updatePost = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const { name, image_name, image_url } = req.body;
+    
     if (!name || !image_name || !image_url) {
       console.warn('[POSTS] Missing required fields for post update');
       return res.status(400).json({ error: 'Missing required fields: name, image_name, image_url' });
     }
-    const postRef = db.collection(POSTS_COLLECTION).doc(id);
-    const postDoc = await postRef.get();
-    if (!postDoc.exists) {
+
+    // Find and update post
+    const post = await Post.findByIdAndUpdate(
+      id,
+      {
+        name,
+        image_name,
+        image_url,
+      },
+      { new: true, runValidators: true } // Return updated document and run validators
+    );
+
+    if (!post) {
       console.warn(`[POSTS] Post not found for update: ${id}`);
       return res.status(404).json({ error: 'Post not found' });
     }
-    const updateData = {
-      name,
-      image_name,
-      image_url,
-      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+
+    const postResponse: PostResponse = {
+      id: post._id.toString(),
+      name: post.name,
+      image_name: post.image_name,
+      image_url: post.image_url,
     };
-    await postRef.update(updateData);
-    const updatedPost: Post = {
-      id,
-      ...updateData
-    } as Post;
+
     console.log(`[POSTS] Updated post: ${id} - ${name}`);
-    res.status(200).json({ data: updatedPost });
-  } catch (error) {
+    res.status(200).json({ data: postResponse });
+  } catch (error: any) {
     console.error('[POSTS] updatePost error:', error);
-    res.status(500).json({ error: 'Failed to update post' });
+    
+    // Handle invalid ObjectId format
+    if (error.name === 'CastError') {
+      return res.status(400).json({ error: 'Invalid post ID format' });
+    }
+    
+    // Handle validation errors
+    if (error.name === 'ValidationError') {
+      const messages = Object.values(error.errors).map((err: any) => err.message);
+      return res.status(400).json({ error: messages.join(', ') });
+    }
+    
+    res.status(500).json({ 
+      error: 'Failed to update post',
+      details: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
   }
 };
 
 /**
- * Deletes a blog post by ID from Firestore.
+ * Deletes a blog post by ID from MongoDB.
  * 
  * @param req - Express request object
  * @param req.params.id - The ID of the post to delete
@@ -234,18 +262,27 @@ export const updatePost = async (req: Request, res: Response) => {
 export const deletePost = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const postRef = db.collection(POSTS_COLLECTION).doc(id);
-    const postDoc = await postRef.get();
-    if (!postDoc.exists) {
+    
+    const post = await Post.findByIdAndDelete(id);
+
+    if (!post) {
       console.warn(`[POSTS] Post not found for deletion: ${id}`);
       return res.status(404).json({ error: 'Post not found' });
     }
-    const postData = postDoc.data();
-    await postRef.delete();
-    console.log(`[POSTS] Deleted post: ${id} - ${postData?.name || 'Unknown'}`);
+
+    console.log(`[POSTS] Deleted post: ${id} - ${post.name}`);
     res.status(200).json({ message: 'Post deleted successfully' });
-  } catch (error) {
+  } catch (error: any) {
     console.error('[POSTS] deletePost error:', error);
-    res.status(500).json({ error: 'Failed to delete post' });
+    
+    // Handle invalid ObjectId format
+    if (error.name === 'CastError') {
+      return res.status(400).json({ error: 'Invalid post ID format' });
+    }
+    
+    res.status(500).json({ 
+      error: 'Failed to delete post',
+      details: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
   }
 };

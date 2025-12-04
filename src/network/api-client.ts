@@ -39,10 +39,9 @@ export const postsAPI = {
 };
 
 export const uploadAPI = {
-  upload: (file: File, path: string = 'images') => {
+  upload: (file: File) => {
     const formData = new FormData();
     formData.append('image', file);
-    formData.append('path', path);
     return api.post('/upload', formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     });
@@ -50,14 +49,10 @@ export const uploadAPI = {
 };
 
 export const authAPI = {
-  register: (email: string, password: string) => 
-    api.post('/auth/register', { email, password }),
-  registerWithToken: (idToken: string) => 
-    api.post('/auth/register', { idToken }),
+  register: (email: string, password: string, name?: string) => 
+    api.post('/auth/register', { email, password, name }),
   login: (email: string, password: string) => 
     api.post('/auth/login', { email, password }),
-  loginWithToken: (idToken: string) => 
-    api.post('/auth/login', { idToken }),
   logout: () => api.post('/auth/logout'),
   getCurrentUser: () => api.get('/auth/me'),
 };

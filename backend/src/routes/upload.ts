@@ -1,8 +1,11 @@
 import { Router } from 'express';
 import { uploadImage, uploadMiddleware } from '../controllers/uploadController';
-import { authMiddleware } from '../middleware/authMiddleware'; // Protect upload route
+import { authMiddleware } from '../middleware/authMiddleware';
 
 const router = Router();
+
+// All upload routes require authentication
+router.use(authMiddleware);
 
 /**
  * @swagger
@@ -48,6 +51,6 @@ const router = Router();
  *       500:
  *         description: Failed to upload image
  */
-router.post('/', authMiddleware, uploadMiddleware, uploadImage);
+router.post('/', uploadMiddleware, uploadImage);
 
 export default router;
